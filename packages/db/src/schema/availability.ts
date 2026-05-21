@@ -1,7 +1,7 @@
 import { pgTable, uuid, boolean, time, timestamp } from "drizzle-orm/pg-core"
-import { dayOfWeekEnum } from "./enums.js"
-import { businesses } from "./businesses.js"
-import { staff } from "./staff.js"
+import { dayOfWeekEnum } from "./enums"
+import { businesses } from "./businesses"
+import { staff } from "./staff"
 
 export const availability = pgTable("availability", {
   id:          uuid("id").primaryKey().defaultRandom(),

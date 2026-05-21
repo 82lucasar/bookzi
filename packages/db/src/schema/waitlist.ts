@@ -1,8 +1,8 @@
 import { pgTable, uuid, varchar, date, timestamp } from "drizzle-orm/pg-core"
-import { businesses } from "./businesses.js"
-import { services } from "./services.js"
-import { staff } from "./staff.js"
-import { clients } from "./clients.js"
+import { businesses } from "./businesses"
+import { services } from "./services"
+import { staff } from "./staff"
+import { clients } from "./clients"
 
 export const waitlist = pgTable("waitlist", {
   id:            uuid("id").primaryKey().defaultRandom(),

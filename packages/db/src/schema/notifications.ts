@@ -3,8 +3,8 @@ import {
   notificationChannelEnum,
   notificationEventEnum,
   notificationStatusEnum,
-} from "./enums.js"
-import { appointments } from "./appointments.js"
+} from "./enums"
+import { appointments } from "./appointments"
 
 export const notifications = pgTable("notifications", {
   id:            uuid("id").primaryKey().defaultRandom(),
