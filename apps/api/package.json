@@ -1,0 +1,36 @@
+{
+  "name": "@bookzi/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@bookzi/db": "workspace:*",
+    "@bookzi/shared": "workspace:*",
+    "fastify": "^5.2.1",
+    "@fastify/cors": "^10.0.1",
+    "@fastify/helmet": "^13.0.0",
+    "@fastify/rate-limit": "^10.1.1",
+    "@fastify/jwt": "^9.0.1",
+    "@supabase/supabase-js": "^2.47.0",
+    "bullmq": "^5.34.8",
+    "@upstash/redis": "^1.34.3",
+    "resend": "^4.0.1",
+    "zod": "^3.23.8",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@bookzi/tsconfig": "workspace:*",
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@bookzi/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.38.3",
+    "@neondatabase/serverless": "^0.10.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@bookzi/tsconfig": "workspace:*",
+    "drizzle-kit": "^0.30.1",
+    "typescript": "^5.7.2",
+    "dotenv": "^16.4.7"
+  }
+}

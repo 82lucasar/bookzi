@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bookzi — Manual de Marca</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary:       #0284C7;
+    --primary-dark:  #0369A1;
+    --primary-light: #38BDF8;
+    --secondary:     #0EA5E9;
+    --accent:        #059669;
+    --accent-light:  #34D399;
+    --bg:            #F0F9FF;
+    --bg-white:      #FFFFFF;
+    --text-dark:     #0F172A;
+    --text-mid:      #334155;
+    --text-muted:    #64748B;
+    --border:        #E0F0F8;
+    --muted:         #EFF7FB;
+    --font: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: #F8FAFC;
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--secondary) 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.08) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 50%);
+  }
+  .cover-logo {
+    width: 120px; height: 120px;
+    background: white;
+    border-radius: 32px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    position: relative;
+    z-index: 1;
+  }
+  .cover-logo svg { width: 72px; height: 72px; }
+  .cover-brand { font-size: 64px; font-weight: 800; letter-spacing: -2px; margin-bottom: 8px; position: relative; z-index: 1; }
+  .cover-brand span { color: var(--accent-light); }
+  .cover-tagline { font-size: 20px; font-weight: 400; opacity: 0.85; margin-bottom: 48px; position: relative; z-index: 1; }
+  .cover-meta { font-size: 13px; opacity: 0.5; position: relative; z-index: 1; }
+
+  /* ── Layout ── */
+  .page { max-width: 960px; margin: 0 auto; padding: 64px 32px; }
+
+  /* ── Section headers ── */
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--primary);
+    background: rgba(2,132,199,0.08); padding: 4px 12px;
+    border-radius: 100px; margin-bottom: 12px;
+  }
+  h2 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  h3 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  .section-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 48px; max-width: 560px; }
+  .divider { height: 1px; background: var(--border); margin: 72px 0; }
+
+  /* ── Logo section ── */
+  .logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; margin-bottom: 48px; }
+  .logo-card {
+    border-radius: 20px; padding: 40px 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    border: 1px solid var(--border);
+  }
+  .logo-card.light { background: white; }
+  .logo-card.dark  { background: var(--text-dark); }
+  .logo-card.blue  { background: var(--primary); }
+  .logo-card.muted { background: var(--muted); }
+  .logo-card-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .logo-card.dark  .logo-card-label { color: rgba(255,255,255,0.5); }
+  .logo-card.blue  .logo-card-label { color: rgba(255,255,255,0.7); }
+
+  /* SVG Logo */
+  .bz-logo-icon { display: inline-flex; }
+
+  /* ── Colors ── */
+  .colors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 48px; }
+  .color-swatch {
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--border);
+    background: white;
+  }
+  .swatch-block { height: 100px; }
+  .swatch-info { padding: 12px 14px; }
+  .swatch-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .swatch-hex  { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+  .swatch-role { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── Typography ── */
+  .type-scale { display: flex; flex-direction: column; gap: 20px; margin-bottom: 48px; }
+  .type-row { display: flex; align-items: baseline; gap: 24px; padding: 20px 24px; background: white; border-radius: 16px; border: 1px solid var(--border); }
+  .type-meta { flex-shrink: 0; width: 120px; }
+  .type-meta-name  { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--primary); }
+  .type-meta-spec  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .type-sample { flex: 1; }
+
+  /* ── Spacing ── */
+  .spacing-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 48px; align-items: flex-end; }
+  .spacing-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .spacing-bar { background: var(--primary); border-radius: 4px; width: 40px; }
+  .spacing-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+
+  /* ── App icon grid ── */
+  .icon-variants { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 48px; }
+  .icon-variant { text-align: center; }
+  .icon-box {
+    width: 100%; aspect-ratio: 1;
+    border-radius: 28%;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  }
+  .icon-box svg { width: 55%; height: 55%; }
+  .icon-variant-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+
+  /* ── UI Components ── */
+  .components-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 48px; }
+  .component-card { background: white; border-radius: 20px; padding: 28px; border: 1px solid var(--border); }
+  .component-title { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px; }
+
+  /* Buttons */
+  .btn-demo { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 10px; font-family: var(--font);
+    font-size: 14px; font-weight: 600; border: none; cursor: pointer;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-secondary { background: var(--muted); color: var(--primary); }
+  .btn-accent  { background: var(--accent); color: white; }
+  .btn-outline  { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+
+  /* Input */
+  .input-demo { display: flex; flex-direction: column; gap: 6px; }
+  .input-label { font-size: 13px; font-weight: 600; color: var(--text-mid); }
+  .input-field {
+    padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+    font-family: var(--font); font-size: 14px; color: var(--text-dark);
+    background: var(--bg); outline: none;
+  }
+  .input-field:focus { border-color: var(--primary); }
+
+  /* Badge */
+  .badge-demo { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  }
+  .badge-blue    { background: rgba(2,132,199,0.12); color: var(--primary-dark); }
+  .badge-green   { background: rgba(5,150,105,0.12); color: #047857; }
+  .badge-yellow  { background: rgba(245,158,11,0.12); color: #B45309; }
+  .badge-red     { background: rgba(220,38,38,0.10); color: #B91C1C; }
+
+  /* Appointment card */
+  .appt-card {
+    background: white; border-radius: 16px; padding: 16px;
+    border: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start;
+  }
+  .appt-date-box {
+    width: 48px; flex-shrink: 0; background: var(--primary); color: white;
+    border-radius: 12px; text-align: center; padding: 6px;
+  }
+  .appt-day   { font-size: 22px; font-weight: 800; line-height: 1; }
+  .appt-month { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: 0.85; }
+  .appt-info  { flex: 1; }
+  .appt-name  { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .appt-time  { font-size: 12px; color: var(--text-muted); }
+  .appt-status { align-self: center; }
+
+  /* ── Voice & Tone ── */
+  .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+  .voice-card { padding: 24px; border-radius: 16px; border: 1px solid var(--border); }
+  .voice-card.do   { background: rgba(5,150,105,0.05); border-color: rgba(5,150,105,0.2); }
+  .voice-card.dont { background: rgba(220,38,38,0.04); border-color: rgba(220,38,38,0.15); }
+  .voice-tag { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+  .voice-tag.do-tag   { color: #047857; }
+  .voice-tag.dont-tag { color: #B91C1C; }
+  .voice-example { font-size: 14px; line-height: 1.7; color: var(--text-mid); }
+
+  /* ── Usage rules ── */
+  .rules-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px; }
+  .rule-item { display: flex; gap: 16px; padding: 20px; background: white; border-radius: 16px; border: 1px solid var(--border); }
+  .rule-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+  .rule-icon.ok  { background: rgba(5,150,105,0.1); }
+  .rule-icon.no  { background: rgba(220,38,38,0.1); }
+  .rule-body h4  { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .rule-body p   { font-size: 13px; color: var(--text-muted); }
+
+  /* ── Footer ── */
+  .brand-footer {
+    background: var(--text-dark); color: white;
+    padding: 48px 32px; text-align: center;
+  }
+  .brand-footer .logo-name { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+  .brand-footer .logo-name span { color: var(--primary-light); }
+  .brand-footer p { margin-top: 8px; color: rgba(255,255,255,0.4); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- ══ COVER ══ -->
+<div class="cover">
+  <div class="cover-logo">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Calendar base -->
+      <rect x="10" y="16" width="52" height="46" rx="10" fill="#0284C7"/>
+      <!-- Header strip -->
+      <rect x="10" y="16" width="52" height="18" rx="10" fill="#0369A1"/>
+      <rect x="10" y="26" width="52" height="8" fill="#0369A1"/>
+      <!-- Ring pins -->
+      <rect x="24" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+      <rect x="43" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+      <!-- Checkmark -->
+      <path d="M24 44 L32 52 L50 34" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="cover-brand">Book<span>zi</span></div>
+  <div class="cover-tagline">Tu agenda inteligente para profesionales y negocios</div>
+  <div class="cover-meta">Manual de Marca · v1.0 · 2025</div>
+</div>
+
+<!-- ══ IDENTIDAD ══ -->
+<div class="page">
+
+  <div class="section-label">01 — Identidad</div>
+  <h2>Concepto de Marca</h2>
+  <p class="section-desc">Bookzi transforma la gestión de turnos en una experiencia simple, confiable y moderna. Su nombre combina "Book" (reservar) con el sufijo dinámico "-zi" que transmite agilidad y frescura.</p>
+
+  <!-- Logo variants -->
+  <h3>Variantes del Logo</h3>
+  <div class="logo-grid">
+
+    <div class="logo-card light">
+      <svg class="bz-logo-icon" width="80" height="80" viewBox="0 0 72 72" fill="none">
+        <rect x="10" y="16" width="52" height="46" rx="10" fill="#0284C7"/>
+        <rect x="10" y="16" width="52" height="18" rx="10" fill="#0369A1"/>
+        <rect x="10" y="26" width="52" height="8" fill="#0369A1"/>
+        <rect x="24" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+        <rect x="43" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+        <path d="M24 44 L32 52 L50 34" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="logo-card-label" style="color:#64748B">Fondo blanco</span>
+    </div>
+
+    <div class="logo-card dark">
+      <svg class="bz-logo-icon" width="80" height="80" viewBox="0 0 72 72" fill="none">
+        <rect x="10" y="16" width="52" height="46" rx="10" fill="#0284C7"/>
+        <rect x="10" y="16" width="52" height="18" rx="10" fill="#0369A1"/>
+        <rect x="10" y="26" width="52" height="8" fill="#0369A1"/>
+        <rect x="24" y="10" width="5" height="14" rx="2.5" fill="#93C5FD"/>
+        <rect x="43" y="10" width="5" height="14" rx="2.5" fill="#93C5FD"/>
+        <path d="M24 44 L32 52 L50 34" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="logo-card-label">Fondo oscuro</span>
+    </div>
+
+    <div class="logo-card blue">
+      <svg class="bz-logo-icon" width="80" height="80" viewBox="0 0 72 72" fill="none">
+        <rect x="10" y="16" width="52" height="46" rx="10" fill="white"/>
+        <rect x="10" y="16" width="52" height="18" rx="10" fill="#E0F0F8"/>
+        <rect x="10" y="26" width="52" height="8" fill="#E0F0F8"/>
+        <rect x="24" y="10" width="5" height="14" rx="2.5" fill="#0369A1"/>
+        <rect x="43" y="10" width="5" height="14" rx="2.5" fill="#0369A1"/>
+        <path d="M24 44 L32 52 L50 34" stroke="#0284C7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="logo-card-label">Fondo primario</span>
+    </div>
+
+    <div class="logo-card muted">
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="44" height="44" viewBox="0 0 72 72" fill="none">
+          <rect x="10" y="16" width="52" height="46" rx="10" fill="#0284C7"/>
+          <rect x="10" y="16" width="52" height="18" rx="10" fill="#0369A1"/>
+          <rect x="10" y="26" width="52" height="8" fill="#0369A1"/>
+          <rect x="24" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+          <rect x="43" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+          <path d="M24 44 L32 52 L50 34" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span style="font-size:28px;font-weight:800;color:#0F172A;letter-spacing:-1px">Book<span style="color:#0284C7">zi</span></span>
+      </div>
+      <span class="logo-card-label" style="color:#64748B">Horizontal</span>
+    </div>
+
+  </div>
+
+  <!-- App icons -->
+  <h3>Ícono de App</h3>
+  <div class="icon-variants">
+    <div class="icon-variant">
+      <div class="icon-box" style="background:linear-gradient(135deg,#0369A1,#0284C7)">
+        <svg viewBox="0 0 72 72" fill="none">
+          <rect x="10" y="16" width="52" height="46" rx="10" fill="white" opacity="0.95"/>
+          <rect x="10" y="16" width="52" height="18" rx="10" fill="#E0F0F8"/>
+          <rect x="10" y="26" width="52" height="8" fill="#E0F0F8"/>
+          <rect x="24" y="10" width="5" height="14" rx="2.5" fill="white" opacity="0.6"/>
+          <rect x="43" y="10" width="5" height="14" rx="2.5" fill="white" opacity="0.6"/>
+          <path d="M24 44 L32 52 L50 34" stroke="#0284C7" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="icon-variant-label">Azul gradiente</div>
+    </div>
+    <div class="icon-variant">
+      <div class="icon-box" style="background:#0F172A">
+        <svg viewBox="0 0 72 72" fill="none">
+          <rect x="10" y="16" width="52" height="46" rx="10" fill="#0284C7"/>
+          <rect x="10" y="16" width="52" height="18" rx="10" fill="#0369A1"/>
+          <rect x="10" y="26" width="52" height="8" fill="#0369A1"/>
+          <rect x="24" y="10" width="5" height="14" rx="2.5" fill="#93C5FD"/>
+          <rect x="43" y="10" width="5" height="14" rx="2.5" fill="#93C5FD"/>
+          <path d="M24 44 L32 52 L50 34" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="icon-variant-label">Dark mode</div>
+    </div>
+    <div class="icon-variant">
+      <div class="icon-box" style="background:linear-gradient(135deg,#0284C7,#059669)">
+        <svg viewBox="0 0 72 72" fill="none">
+          <rect x="10" y="16" width="52" height="46" rx="10" fill="white" opacity="0.95"/>
+          <rect x="10" y="16" width="52" height="18" rx="10" fill="#E0F0F8"/>
+          <rect x="10" y="26" width="52" height="8" fill="#E0F0F8"/>
+          <rect x="24" y="10" width="5" height="14" rx="2.5" fill="white" opacity="0.7"/>
+          <rect x="43" y="10" width="5" height="14" rx="2.5" fill="white" opacity="0.7"/>
+          <path d="M24 44 L32 52 L50 34" stroke="#059669" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="icon-variant-label">Azul + verde</div>
+    </div>
+    <div class="icon-variant">
+      <div class="icon-box" style="background:white;border:1.5px solid #E0F0F8">
+        <svg viewBox="0 0 72 72" fill="none">
+          <rect x="10" y="16" width="52" height="46" rx="10" fill="#0284C7"/>
+          <rect x="10" y="16" width="52" height="18" rx="10" fill="#0369A1"/>
+          <rect x="10" y="26" width="52" height="8" fill="#0369A1"/>
+          <rect x="24" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+          <rect x="43" y="10" width="5" height="14" rx="2.5" fill="#334155"/>
+          <path d="M24 44 L32 52 L50 34" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="icon-variant-label">Fondo blanco</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ COLORS ══ -->
+  <div class="section-label">02 — Colores</div>
+  <h2>Paleta de Colores</h2>
+  <p class="section-desc">Una paleta basada en azul cielo profesional con acento verde confianza. Transmite eficiencia, claridad y credibilidad.</p>
+
+  <div class="colors-grid">
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#0284C7"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Bookzi Blue</div>
+        <div class="swatch-hex">#0284C7</div>
+        <div class="swatch-role">Color primario</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#0369A1"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Deep Blue</div>
+        <div class="swatch-hex">#0369A1</div>
+        <div class="swatch-role">Primario oscuro</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#38BDF8"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Sky Light</div>
+        <div class="swatch-hex">#38BDF8</div>
+        <div class="swatch-role">Primario claro</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#059669"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Confirm Green</div>
+        <div class="swatch-hex">#059669</div>
+        <div class="swatch-role">Acento / CTA</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#34D399"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Success Light</div>
+        <div class="swatch-hex">#34D399</div>
+        <div class="swatch-role">Acento claro</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#F0F9FF"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Ice Blue</div>
+        <div class="swatch-hex">#F0F9FF</div>
+        <div class="swatch-role">Background</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#0F172A"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Midnight</div>
+        <div class="swatch-hex">#0F172A</div>
+        <div class="swatch-role">Texto principal</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#64748B"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Slate</div>
+        <div class="swatch-hex">#64748B</div>
+        <div class="swatch-role">Texto secundario</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="swatch-block" style="background:#DC2626"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Cancel Red</div>
+        <div class="swatch-hex">#DC2626</div>
+        <div class="swatch-role">Error / cancelar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ TYPOGRAPHY ══ -->
+  <div class="section-label">03 — Tipografía</div>
+  <h2>Sistema Tipográfico</h2>
+  <p class="section-desc">Plus Jakarta Sans — una sans moderna, amigable y altamente legible. Perfecta para SaaS y apps B2B.</p>
+
+  <div class="type-scale">
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-meta-name">Display</div>
+        <div class="type-meta-spec">48px / 800 / -1.5px</div>
+      </div>
+      <div class="type-sample" style="font-size:48px;font-weight:800;letter-spacing:-1.5px;line-height:1.1">Bookzi</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-meta-name">Heading 1</div>
+        <div class="type-meta-spec">36px / 800 / -1px</div>
+      </div>
+      <div class="type-sample" style="font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1.2">Gestioná tus turnos</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-meta-name">Heading 2</div>
+        <div class="type-meta-spec">24px / 700</div>
+      </div>
+      <div class="type-sample" style="font-size:24px;font-weight:700;line-height:1.3">Nueva reserva confirmada</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-meta-name">Subtitle</div>
+        <div class="type-meta-spec">18px / 600</div>
+      </div>
+      <div class="type-sample" style="font-size:18px;font-weight:600;line-height:1.4">Martes 10 de junio, 14:30 hs</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-meta-name">Body</div>
+        <div class="type-meta-spec">16px / 400 / 1.6lh</div>
+      </div>
+      <div class="type-sample" style="font-size:16px;font-weight:400;line-height:1.6;color:#334155">Tu cliente recibirá una confirmación automática por WhatsApp y email. Podés cancelar o reprogramar hasta 2 horas antes.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-meta-name">Caption</div>
+        <div class="type-meta-spec">12px / 500</div>
+      </div>
+      <div class="type-sample" style="font-size:12px;font-weight:500;color:#64748B;letter-spacing:.03em">Turno confirmado · hace 5 minutos</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ COMPONENTS ══ -->
+  <div class="section-label">04 — Componentes</div>
+  <h2>Sistema de UI</h2>
+  <p class="section-desc">Componentes clave de la interfaz con sus estados y variantes definidos.</p>
+
+  <div class="components-grid">
+
+    <div class="component-card">
+      <div class="component-title">Botones</div>
+      <div class="btn-demo">
+        <button class="btn btn-primary">Reservar turno</button>
+        <button class="btn btn-accent">Confirmar</button>
+      </div>
+      <div class="btn-demo" style="margin-top:12px">
+        <button class="btn btn-secondary">Ver agenda</button>
+        <button class="btn btn-outline">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="component-card">
+      <div class="component-title">Estados de turno</div>
+      <div class="badge-demo">
+        <span class="badge badge-green">✓ Confirmado</span>
+        <span class="badge badge-yellow">⏳ Pendiente</span>
+        <span class="badge badge-red">✕ Cancelado</span>
+        <span class="badge badge-blue">↻ Reprogramado</span>
+      </div>
+    </div>
+
+    <div class="component-card">
+      <div class="component-title">Campo de formulario</div>
+      <div class="input-demo">
+        <label class="input-label">Nombre del cliente</label>
+        <input class="input-field" type="text" placeholder="Ej: María González"/>
+      </div>
+      <div class="input-demo" style="margin-top:12px">
+        <label class="input-label">Servicio</label>
+        <input class="input-field" type="text" placeholder="Seleccioná un servicio"/>
+      </div>
+    </div>
+
+    <div class="component-card">
+      <div class="component-title">Tarjeta de turno</div>
+      <div class="appt-card">
+        <div class="appt-date-box">
+          <div class="appt-day">10</div>
+          <div class="appt-month">JUN</div>
+        </div>
+        <div class="appt-info">
+          <div class="appt-name">María González</div>
+          <div class="appt-time">14:30 · Consulta médica · 45 min</div>
+        </div>
+        <div class="appt-status">
+          <span class="badge badge-green">✓</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Spacing -->
+  <h3>Escala de Espaciado <span style="font-size:14px;font-weight:400;color:#64748B">(base 4dp)</span></h3>
+  <div class="spacing-grid">
+    <div class="spacing-item"><div class="spacing-bar" style="height:4px"></div><div class="spacing-label">4</div></div>
+    <div class="spacing-item"><div class="spacing-bar" style="height:8px"></div><div class="spacing-label">8</div></div>
+    <div class="spacing-item"><div class="spacing-bar" style="height:12px"></div><div class="spacing-label">12</div></div>
+    <div class="spacing-item"><div class="spacing-bar" style="height:16px"></div><div class="spacing-label">16</div></div>
+    <div class="spacing-item"><div class="spacing-bar" style="height:24px"></div><div class="spacing-label">24</div></div>
+    <div class="spacing-item"><div class="spacing-bar" style="height:32px"></div><div class="spacing-label">32</div></div>
+    <div class="spacing-item"><div class="spacing-bar" style="height:48px"></div><div class="spacing-label">48</div></div>
+    <div class="spacing-item"><div class="spacing-bar" style="height:64px"></div><div class="spacing-label">64</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ VOICE & TONE ══ -->
+  <div class="section-label">05 — Voz y Tono</div>
+  <h2>Comunicación de Marca</h2>
+  <p class="section-desc">Bookzi habla como un asistente experto: claro, directo y empático. Nunca robótico ni distante.</p>
+
+  <div class="voice-grid">
+    <div class="voice-card do">
+      <div class="voice-tag do-tag">✓ Decimos</div>
+      <div class="voice-example">"Tu turno está confirmado para el martes a las 14:30. ¡Nos vemos!"</div>
+    </div>
+    <div class="voice-card dont">
+      <div class="voice-tag dont-tag">✕ Evitamos</div>
+      <div class="voice-example">"El sistema ha procesado exitosamente su solicitud de reserva N°4521."</div>
+    </div>
+    <div class="voice-card do">
+      <div class="voice-tag do-tag">✓ Decimos</div>
+      <div class="voice-example">"Recordá que podés reprogramar hasta 2 horas antes sin costo."</div>
+    </div>
+    <div class="voice-card dont">
+      <div class="voice-tag dont-tag">✕ Evitamos</div>
+      <div class="voice-example">"La política de cancelación estipula un mínimo de 120 minutos de anticipación."</div>
+    </div>
+    <div class="voice-card do">
+      <div class="voice-tag do-tag">✓ Decimos</div>
+      <div class="voice-example">"¡Listo! Enviamos la confirmación a tu cliente por WhatsApp."</div>
+    </div>
+    <div class="voice-card dont">
+      <div class="voice-tag dont-tag">✕ Evitamos</div>
+      <div class="voice-example">"Notificación enviada al destinatario registrado en el sistema."</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ USAGE RULES ══ -->
+  <div class="section-label">06 — Reglas de Uso</div>
+  <h2>Uso del Logo</h2>
+  <p class="section-desc">Lineamientos para mantener la coherencia visual de Bookzi en todos los contextos.</p>
+
+  <div class="rules-list">
+    <div class="rule-item">
+      <div class="rule-icon ok">✓</div>
+      <div class="rule-body">
+        <h4>Espacio mínimo</h4>
+        <p>Mantener un espacio libre equivalente a la altura de la letra "B" alrededor del logo en todos sus lados.</p>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-icon ok">✓</div>
+      <div class="rule-body">
+        <h4>Tamaño mínimo digital</h4>
+        <p>Ícono solo: mínimo 24×24px. Logo horizontal completo: mínimo 120px de ancho.</p>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-icon no">✕</div>
+      <div class="rule-body">
+        <h4>No distorsionar</h4>
+        <p>Nunca estirar, comprimir o rotar el logo. Siempre escalar proporcionalmente.</p>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-icon no">✕</div>
+      <div class="rule-body">
+        <h4>No cambiar colores</h4>
+        <p>Usar solo las variantes aprobadas. No aplicar colores del logo sobre fondos con bajo contraste.</p>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-icon no">✕</div>
+      <div class="rule-body">
+        <h4>No agregar efectos</h4>
+        <p>Sin sombras, degradados externos, contornos ni transparencias no definidas en este manual.</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ══ FOOTER ══ -->
+<div class="brand-footer">
+  <div class="logo-name">Book<span>zi</span></div>
+  <p>Manual de Marca v1.0 — Confidencial</p>
+</div>
+
+</body>
+</html>

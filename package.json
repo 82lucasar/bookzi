@@ -1,0 +1,22 @@
+{
+  "name": "bookzi",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "prettier": "^3.4.2",
+    "@types/node": "^22.10.1"
+  },
+  "packageManager": "pnpm@11.2.2",
+  "engines": {
+    "node": ">=18"
+  }
+}

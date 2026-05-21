@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  /* Bookzi design tokens */
+  --color-primary: #0284C7;
+  --color-primary-dark: #0369A1;
+  --color-primary-light: #38BDF8;
+  --color-accent: #059669;
+  --color-accent-light: #34D399;
+  --color-bg: #F0F9FF;
+  --color-text-dark: #0F172A;
+  --color-text-mid: #334155;
+  --color-text-muted: #64748B;
+  --color-border: #E0F0F8;
+  --color-error: #DC2626;
+
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  --font-size-display: 3rem;
+  --font-size-h1: 2.25rem;
+  --font-size-h2: 1.5rem;
+  --font-size-subtitle: 1.125rem;
+  --font-size-body: 1rem;
+  --font-size-caption: 0.75rem;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-bg);
+    color: var(--color-text-dark);
+    font-family: var(--font-sans);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}

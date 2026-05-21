@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Environment variables — NUNCA commitear estos archivos
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Turbo
+.turbo/
+
+# Testing
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Expo / React Native
+.expo/
+android/
+ios/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Misc
+*.pem
+*.key

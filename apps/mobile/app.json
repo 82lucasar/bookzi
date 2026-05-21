@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Bookzi",
+    "slug": "bookzi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "bookzi",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F0F9FF"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F0F9FF"
+      },
+      "package": "com.bookzi.app"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bookzi.app"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
