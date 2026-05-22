@@ -1,0 +1,630 @@
+================================================================================
+BOOKZI — PROMPT DE DISEÑO UX/UI COMPLETO
+Design System · v1.0 · Basado en Brand Manual v1.0
+Mercado: Argentina / Uruguay · Idioma UI: Español rioplatense
+================================================================================
+
+
+POR QUÉ EXISTE ESTE DOCUMENTO
+──────────────────────────────
+Bookzi todavía no tiene ni una pantalla implementada. Este prompt es el puente
+entre el manual de marca (identidad visual) y el código real de la interfaz.
+Su propósito es que cualquier desarrollador o diseñador pueda abrir este
+documento y saber exactamente qué construir, cómo hacerlo lucir y por qué
+cada decisión existe.
+
+
+================================================================================
+01 — CONTEXTO DEL PRODUCTO
+================================================================================
+
+¿Qué es Bookzi?
+  Una plataforma B2B2C de gestión de turnos online para profesionales y
+  negocios de Argentina y Uruguay.
+
+¿Quién lo usa?
+  - Profesional (admin): médico, peluquero, psicólogo, entrenador personal —
+    gestiona su agenda, confirma y cancela turnos.
+  - Cliente (end user): reserva un turno desde un link compartido, recibe
+    confirmación por WhatsApp y email.
+
+Tono de mercado:
+  Rioplatense. Voseo en toda la UI. Informal pero confiable. El producto habla
+  como un asistente experto que conoce al profesional de hace años.
+
+
+================================================================================
+02 — DESIGN TOKENS (FUENTE DE VERDAD)
+================================================================================
+
+COLORES
+───────
+
+  /* Primarios */
+  --color-primary:        #0284C7;  /* Bookzi Blue — botones principales, links */
+  --color-primary-dark:   #0369A1;  /* Deep Blue — hover states, headers */
+  --color-primary-light:  #38BDF8;  /* Sky Light — highlights, selected states */
+  --color-secondary:      #0EA5E9;  /* Sky Medium — gradientes secundarios */
+
+  /* Acento */
+  --color-accent:         #059669;  /* Confirm Green — CTAs de confirmación */
+  --color-accent-light:   #34D399;  /* Success Light — estados exitosos */
+
+  /* Backgrounds */
+  --color-bg:             #F0F9FF;  /* Ice Blue — background general de la app */
+  --color-bg-white:       #FFFFFF;  /* Cards, modales, panels */
+  --color-bg-muted:       #EFF7FB;  /* Inputs, áreas secundarias */
+
+  /* Texto */
+  --color-text-dark:      #0F172A;  /* Midnight — texto principal */
+  --color-text-mid:       #334155;  /* Texto de soporte */
+  --color-text-muted:     #64748B;  /* Slate — captions, placeholders */
+
+  /* Bordes */
+  --color-border:         #E0F0F8;  /* Bordes de cards e inputs */
+
+  /* Estados */
+  --color-error:          #DC2626;  /* Cancel Red — errores y cancelaciones */
+  --color-warning:        #F59E0B;  /* Pendiente */
+  --color-warning-dark:   #B45309;  /* Texto sobre warning */
+  --color-error-dark:     #B91C1C;  /* Texto sobre error */
+
+
+TIPOGRAFÍA — Plus Jakarta Sans (Google Fonts)
+─────────────────────────────────────────────
+
+  Nivel       Tamaño   Weight   Letter-spacing   Uso
+  ──────────────────────────────────────────────────────────────────────────
+  Display      48px     800       -1.5px         Hero, onboarding
+  Heading 1    36px     800       -1px           Títulos de pantalla
+  Heading 2    24px     700       —              Secciones, modales
+  Subtitle     18px     600       —              Subtítulos, etiquetas clave
+  Body         16px     400       —              Contenido principal (lh: 1.6)
+  Caption      12px     500       +0.03em        Metadatos, timestamps
+
+  Regla: nunca usar font-weight menor a 400 ni mayor a 800.
+  El rango operativo de la app es 400–700.
+
+
+ESPACIADO — escala base 4dp
+────────────────────────────
+
+  4 · 8 · 12 · 16 · 24 · 32 · 48 · 64
+
+  Padding interno de cards:              24px
+  Gap entre elementos de lista:          12px
+  Separación entre secciones:            48px
+  Padding horizontal de pantalla (mobile): 16px
+  Padding horizontal de pantalla (tablet): 32px
+
+
+BORDER RADIUS
+─────────────
+
+  --radius-sm:    10px    Inputs, botones
+  --radius-md:    16px    Cards de turno
+  --radius-lg:    20px    Panels, modales
+  --radius-xl:    28%     App icon (relativo)
+  --radius-pill:  100px   Badges, chips
+  --radius-icon:  12px    Date boxes
+
+
+================================================================================
+03 — SISTEMA DE COMPONENTES
+================================================================================
+
+BOTONES
+───────
+
+  El sistema tiene 4 variantes. La regla de uso está ligada a la intención,
+  no a la posición en pantalla.
+
+  btn-primary
+    background: #0284C7 / color: white
+    Acción principal de la pantalla. Solo uno por vista.
+    Ejemplo: "Reservar turno", "Guardar cambios"
+
+  btn-accent
+    background: #059669 / color: white
+    Confirmación irreversible o acción positiva de cierre.
+    Ejemplo: "Confirmar turno", "Marcar como atendido"
+
+  btn-secondary
+    background: #EFF7FB / color: #0284C7
+    Acciones secundarias o navegación neutra.
+    Ejemplo: "Ver agenda", "Volver"
+
+  btn-outline
+    border: 1.5px solid #0284C7 / color: #0284C7
+    Acciones destructivas suaves o alternativas.
+    Ejemplo: "Cancelar", "Descartar"
+
+  Todos los botones comparten:
+    padding: 10px 20px
+    border-radius: 10px
+    font-size: 14px
+    font-weight: 600
+    font-family: Plus Jakarta Sans
+
+  Estados requeridos:
+    default · hover (brightness 0.9) · active (scale 0.97)
+    disabled (opacity 0.45, no pointer-events)
+    loading (spinner inline, texto oculto)
+
+
+BADGES DE ESTADO DE TURNO
+──────────────────────────
+
+  Los 4 estados posibles de un turno tienen mapping visual exacto:
+
+  ✓ Confirmado   → background: rgba(5,150,105,0.12)  / color: #047857
+  ⏳ Pendiente   → background: rgba(245,158,11,0.12) / color: #B45309
+  ✕ Cancelado   → background: rgba(220,38,38,0.10)  / color: #B91C1C
+  ↻ Reprogramado → background: rgba(2,132,199,0.12)  / color: #0369A1
+
+  Especificaciones:
+    padding: 4px 12px
+    border-radius: 100px
+    font-size: 12px
+    font-weight: 600
+
+
+TARJETA DE TURNO (Appointment Card)
+─────────────────────────────────────
+
+  El componente más frecuente de la app. Estructura obligatoria:
+
+  ┌──────────────────────────────────────────────┐
+  │  [DATE BOX]  [INFO]                [STATUS]  │
+  │  ┌──────┐   Nombre del cliente               │
+  │  │  10  │   14:30 · Servicio · 45 min        │
+  │  │ JUN  │                                    │
+  │  └──────┘                                    │
+  └──────────────────────────────────────────────┘
+
+  DATE BOX:
+    width: 48px
+    background: #0284C7
+    border-radius: 12px
+    color: white
+    Día: 22px / 800 / line-height 1
+    Mes: 10px / 600 / uppercase / opacidad 0.85
+
+  Card container:
+    background: white
+    border: 1px solid #E0F0F8
+    border-radius: 16px
+    padding: 16px
+    gap: 14px
+
+  En hover:
+    box-shadow: 0 4px 16px rgba(2,132,199,0.12)
+    transición: 150ms
+
+
+INPUTS DE FORMULARIO
+─────────────────────
+
+  Label:   13px / 600 / color: #334155
+  Campo:   padding: 10px 14px
+           border-radius: 10px
+           border: 1.5px solid #E0F0F8
+           background: #F0F9FF
+           font-size: 14px / color: #0F172A
+  Focus:   border-color: #0284C7
+           outline: none
+           box-shadow: 0 0 0 3px rgba(2,132,199,0.12)
+  Error:   border-color: #DC2626
+           mensaje de error en 12px / 500 / #DC2626 debajo del campo
+
+
+================================================================================
+04 — FLUJOS DE PANTALLA — VISTA ADMIN (PROFESIONAL)
+================================================================================
+
+4.1 ONBOARDING
+───────────────
+
+  Objetivo: llevar al profesional desde "me registré" hasta "tengo mi primer
+  turno configurado" en menos de 3 minutos.
+
+  Por qué importa: el momento más crítico de conversión. Si el profesional no
+  ve valor en los primeros 3 pasos, abandona.
+
+  ──────────────────────────────────────────────────────────────────────────
+  PANTALLA 1 — BIENVENIDA
+
+  Background: gradiente lineal 135° → #0369A1 a #0284C7 a #0EA5E9
+  Centro:
+    [Logo Bookzi — icono + wordmark]
+    H1 Display: "Hola, [Nombre]"
+    Subtitle: "Configuremos tu agenda en 3 pasos rápidos"
+    [btn-primary] → "Empezar"
+    Caption muted: "Tomá 3 minutos ahora, ganás horas cada semana"
+
+  UX note: el nombre ya viene del formulario de registro. Personalizarlo desde
+  el primer segundo reduce la ansiedad de "¿esto es para mí?".
+
+  ──────────────────────────────────────────────────────────────────────────
+  PANTALLA 2 — PASO 1: TU NEGOCIO
+
+  Progress: "Paso 1 de 3" — barra lineal primary, 33% llenada
+  H2: "¿Cómo se llama tu negocio?"
+  Inputs:
+    Nombre del negocio (requerido)
+    Rubro (selector: médico / peluquería / psicología / entrenamiento / otro)
+    Duración default de turno (15 / 30 / 45 / 60 / 90 min)
+  [btn-primary] → "Siguiente"
+
+  ──────────────────────────────────────────────────────────────────────────
+  PANTALLA 3 — PASO 2: TU DISPONIBILIDAD
+
+  Progress: "Paso 2 de 3" — 66%
+  H2: "¿Cuándo trabajás?"
+  Componente de días: selector visual de lunes a domingo
+    Cada día → chip toggle
+      inactive: bg #EFF7FB / texto #64748B
+      active:   bg #0284C7 / texto white
+  Por cada día activo → expandir inline:
+    Hora inicio / Hora fin (time picker nativo del sistema)
+  [btn-primary] → "Siguiente"
+  [btn-secondary] → "Configurar más tarde"
+
+  UX note: "Configurar más tarde" existe porque forzar la configuración
+  completa genera abandono. El profesional puede publicar primero y ajustar.
+
+  ──────────────────────────────────────────────────────────────────────────
+  PANTALLA 4 — PASO 3: TUS SERVICIOS
+
+  Progress: "Paso 3 de 3" — 100%
+  H2: "¿Qué servicios ofrecés?"
+  Lista de servicios con:
+    Nombre del servicio
+    Duración (selector: 15/30/45/60/90 min)
+    Precio (opcional, con placeholder "$")
+  [btn-outline] → "+ Agregar servicio"
+  [btn-primary] → "¡Listo! Ver mi agenda"
+
+  ──────────────────────────────────────────────────────────────────────────
+  PANTALLA 5 — ¡LISTO!
+
+  Background: radial gradient suave desde #F0F9FF
+  Centro:
+    [Ícono check animado — circle stroke #059669, 80px]
+    H1: "¡Tu agenda está lista!"
+    Body: "Compartí tu link de reservas con tus clientes."
+    [Link copiable: bookzi.app/tu-negocio — bg #EFF7FB, border #E0F0F8]
+    [btn-primary] → "Ir a mi agenda"
+    [btn-secondary] → "Compartir link"
+
+
+4.2 DASHBOARD PRINCIPAL (HOME)
+────────────────────────────────
+
+  Objetivo: el profesional abre la app y en 2 segundos sabe qué tiene hoy,
+  qué está pendiente y qué acción necesita tomar.
+
+  HEADER
+    Logo (24px ícono) + "Bookzi"
+    Saludo: "Buenos días, [Nombre]" — H2 Midnight
+    [Avatar del profesional — 40px circle]
+
+  HERO STRIP — bg: gradiente #0369A1 → #0284C7
+    "Hoy tenés X turnos" — Display bold blanco
+    "Próximo: [Nombre] a las [hora]" — Subtitle blanco opacidad 0.85
+    [btn blanco con texto primary] → "Ver todos"
+
+  SECCIÓN: "Pendientes de confirmación"
+    Subtitle: "Necesitan tu atención"
+    [Lista de Appointment Cards con badge-yellow]
+    Si vacío: estado empty con ícono + "Todo al día"
+
+  SECCIÓN: "Agenda de hoy"
+    Subtitle: "Martes 10 de junio"
+    Timeline vertical:
+      08:00 — [Appointment Card] — badge confirmado
+      09:30 — [Appointment Card] — badge confirmado
+      ... hasta fin del día
+    Slots vacíos: línea punteada muted "Disponible"
+
+  FAB (Floating Action Button)
+    [+ Nueva reserva] — bg #0284C7, ícono + blanco
+    Posición: fixed bottom-right, margen 24px
+
+
+4.3 CREAR NUEVA RESERVA (modal / bottom sheet)
+───────────────────────────────────────────────
+
+  Trigger: FAB o btn-primary en header
+  Presentación: bottom sheet (mobile) / modal centrado (web, max-width 480px)
+
+  PASO 1 — Cliente
+    Input: "Nombre del cliente" (con sugerencias de historial)
+    Input: "WhatsApp" (con prefijo +54 / +598 por selector)
+    Input: "Email" (opcional)
+
+  PASO 2 — Servicio y fecha
+    Selector: Servicio (lista de los servicios configurados)
+    Date picker: calendario mensual
+      Días disponibles: texto normal
+      Días sin disponibilidad: opacidad 0.3, no clickeables
+      Día seleccionado: bg #0284C7, texto blanco, border-radius 50%
+      Hoy: underline primary
+    Time picker: grid de slots disponibles
+      Slot libre:      bg #EFF7FB, border #E0F0F8, texto primary
+      Slot ocupado:    bg muted, texto slate, no clickeable
+      Slot seleccionado: bg #0284C7, texto blanco
+
+  PASO 3 — Confirmación
+    Card resumen (read-only, fondo #F0F9FF):
+      Nombre · Servicio · Fecha · Hora · Duración
+    Toggle: "Enviar confirmación por WhatsApp" — default ON
+    Toggle: "Enviar confirmación por Email" — default ON
+    [btn-accent] → "Confirmar turno"
+    [btn-outline] → "Cancelar"
+
+
+4.4 VISTA DE TURNO INDIVIDUAL
+───────────────────────────────
+
+  Header: ← back + "Turno" + [menú ···]
+
+  Hero card — bg white, border #E0F0F8, border-radius 20px:
+    [DATE BOX grande: 64px, día 36px/800, mes 14px/700]
+    Nombre del cliente — H2
+    Servicio · Duración — Subtitle muted
+    Hora — Subtitle primary bold
+
+  Sección ESTADO:
+    Badge de estado grande (centrado, 16px)
+    Historial de cambios — Caption muted timeline vertical
+
+  Sección CLIENTE:
+    Avatar initials (40px, bg primary-light, texto primary-dark)
+    Nombre completo
+    WhatsApp (clickeable → abre wa.me)
+    Email (clickeable → abre mail client)
+
+  Acciones:
+    Si Pendiente   → [btn-accent "Confirmar"] + [btn-outline "Cancelar"]
+    Si Confirmado  → [btn-secondary "Reprogramar"] + [btn-outline "Cancelar"]
+    Si Cancelado   → [btn-secondary "Crear turno similar"]
+
+
+4.5 MI AGENDA (Calendar View)
+───────────────────────────────
+
+  TOGGLE: Semana / Mes
+    Segmented control: bg muted, selected bg primary, texto white
+
+  VISTA SEMANA:
+    Header días: L · M · X · J · V · S · D + fecha numérica
+    Columna de tiempo (izquierda): 08:00, 09:00... en 12px/500 muted
+    Grid de turnos:
+      Bloque de turno: bg rgba(2,132,199,0.12), border-left 3px solid #0284C7
+      Texto: nombre + hora, 12px/600
+      Si superpuesto: columnas lado a lado
+    Hora actual: línea horizontal roja punteada
+
+  VISTA MES:
+    Grid 7 columnas
+    Cada día: número + dots de colores por estado de turno
+      Verde: confirmados · Amarillo: pendientes · Rojo: cancelados
+    Día con más de 3 turnos: badge numérico primary
+    Tap en día → expande lista de turnos del día (bottom sheet)
+
+
+================================================================================
+05 — FLUJOS DE PANTALLA — VISTA CLIENTE (END USER)
+================================================================================
+
+  El cliente accede desde un link compartido bookzi.app/[negocio].
+  No requiere login propio.
+
+5.1 PÁGINA PÚBLICA DE RESERVA
+───────────────────────────────
+
+  HEADER minimal:
+    Logo Bookzi (pequeño, 24px)
+    Nombre del negocio — H2 Midnight
+
+  INFO DEL NEGOCIO:
+    Foto o ícono del rubro (si el profesional subió una)
+    Nombre · Rubro
+    Rating / reseñas (si aplica — fase 2)
+
+  SELECCIÓN:
+    Paso 1: "¿Qué servicio necesitás?"
+      → lista de servicios con duración y precio
+    Paso 2: Calendario → time picker (mismo componente que admin view)
+    Paso 3: Tus datos (nombre, WhatsApp, email opcional)
+    Paso 4: Confirmación → [btn-accent] "Reservar"
+
+  FEEDBACK inmediato — pantalla de éxito:
+    Check animado verde
+    "¡Turno reservado!"
+    Resumen: fecha · hora · servicio
+    "Te mandamos la confirmación por WhatsApp"
+    [btn-secondary] "Agregar al calendario"
+
+
+5.2 NOTIFICACIONES AL CLIENTE (plantillas de mensaje)
+───────────────────────────────────────────────────────
+
+  WhatsApp — Confirmación:
+  ─────────────────────────
+  ¡Hola [Nombre]!
+  Tu turno está confirmado:
+  📅 Martes 10 de junio
+  ⏰ 14:30 hs
+  📍 [Nombre del negocio]
+  🔧 [Servicio] — 45 min
+
+  Podés cancelar o reprogramar hasta 2 horas antes desde acá:
+  [link]
+
+  ¡Nos vemos!
+
+  WhatsApp — Recordatorio (24h antes):
+  ─────────────────────────────────────
+  Hola [Nombre], te recordamos que mañana tenés turno a las 14:30
+  con [Negocio].
+  ¿Confirmás que vas a asistir?
+  ✅ Sí, confirmo → [link]
+  ❌ Necesito cancelar → [link]
+
+
+================================================================================
+06 — PRINCIPIOS UX TRANSVERSALES
+================================================================================
+
+CLARIDAD ANTE TODO
+──────────────────
+  Cada pantalla tiene una acción principal visible. El btn-primary es la
+  respuesta a "¿qué se supone que tengo que hacer acá?". Si hay dudas sobre
+  cuál es la acción principal, la pantalla tiene un problema de arquitectura
+  de información.
+
+FEEDBACK INMEDIATO
+──────────────────
+  Toda acción con efecto (confirmar, cancelar, enviar mensaje) muestra:
+
+  1. Estado loading en el botón (spinner, texto oculto) — máximo 300ms de delay
+  2. Toast de éxito o error — aparece desde abajo
+       border-radius: 12px / padding: 12px 20px
+       Éxito:  bg #059669 / texto blanco / ícono ✓
+       Error:  bg #DC2626 / texto blanco / ícono ✕
+       Duración: 3 segundos, dismissable con swipe
+
+PROGRESIÓN PROGRESIVA
+──────────────────────
+  La información más importante primero. En la tarjeta de turno: nombre → hora
+  → servicio (en ese orden de jerarquía visual). En formularios: los campos
+  más simples y esperados primero, los opcionales al final.
+
+ESTADOS VACÍOS CON PROPÓSITO
+──────────────────────────────
+  Cada lista puede estar vacía. Diseñar el estado vacío es obligatorio:
+
+  Lista sin turnos hoy:
+    [Ícono calendario muted — 64px]
+    "No tenés turnos para hoy"
+    [btn-primary] → "Crear primer turno"
+
+  El estado vacío no es un error. Es una oportunidad de acción.
+
+ACCESIBILIDAD MÍNIMA REQUERIDA
+────────────────────────────────
+  - Contraste texto/fondo: mínimo 4.5:1 para body, 3:1 para UI large
+  - #0284C7 sobre blanco:  ratio 4.6:1  ✓
+  - #0F172A sobre #F0F9FF: ratio 18.7:1 ✓
+  - Touch targets: mínimo 44×44px en mobile
+  - Focus visible: box-shadow: 0 0 0 3px rgba(2,132,199,0.3) en todos los
+    elementos interactivos
+  - Labels explícitos en todos los inputs (no solo placeholder)
+
+
+================================================================================
+07 — RESPONSIVE Y PLATAFORMAS
+================================================================================
+
+MOBILE FIRST (pantallas ≤ 390px)
+──────────────────────────────────
+  Padding horizontal: 16px
+  Bottom sheet para modales y acciones
+  FAB para acción principal global
+  Bottom navigation bar (máx 5 ítems):
+    Inicio · Agenda · Nueva reserva · Clientes · Config
+
+TABLET (390px – 768px)
+───────────────────────
+  Padding horizontal: 32px
+  Layout de 2 columnas cuando el contenido lo permite
+    (ej: lista de turnos + detalle)
+  Modales centrados con max-width 480px
+
+WEB / DESKTOP (≥ 768px)
+─────────────────────────
+  Sidebar fijo izquierdo: 240px, bg #0F172A, navegación principal
+  Área principal: padding 48px
+  Calendar view en 2 paneles:
+    mini-calendario izquierda + detalle derecha
+
+
+================================================================================
+08 — VOZ Y TONO EN LA UI
+================================================================================
+
+  Bookzi usa voseo rioplatense. Aplica a cada string visible en la interfaz.
+
+  Contexto              | Ejemplo correcto                          | Evitar
+  ──────────────────────────────────────────────────────────────────────────────
+  Acción en botón       | "Reservar turno"                          | "RESERVAR"
+  Confirmación          | "¡Listo! Tu turno está confirmado."       | "Operación completada."
+  Error                 | "No pudimos enviarlo. Intentá de nuevo."  | "Error 500."
+  Empty state           | "Todavía no tenés turnos para hoy."       | "No hay registros."
+  Placeholder           | "Ej: María González"                      | "Ingrese nombre"
+  Tooltip               | "Podés cambiar esto más tarde."           | "Puede ser modificado."
+
+  Regla de oro del copy: si suena a manual de usuario corporativo, reescribilo.
+  Bookzi habla como una persona real que sabe de lo que habla.
+
+
+================================================================================
+09 — ANIMACIONES Y TRANSICIONES
+================================================================================
+
+  /* Transición estándar para estados de UI */
+  transition: all 150ms ease-out;
+
+  /* Entrada de modales / bottom sheets */
+  animation: slide-up 200ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Check de confirmación (turno reservado) */
+  /* SVG stroke-dasharray animation, 400ms ease-out */
+
+  /* Toast de feedback */
+  animation: toast-in 200ms ease-out, toast-out 200ms ease-in 2800ms;
+
+  /* Loading de botón */
+  /* Spinner SVG 20px, stroke #FFFFFF, 800ms linear infinite */
+
+  Principio: duración máxima de transición en interacciones: 200ms.
+  Para animaciones de celebración (reserva exitosa): hasta 600ms.
+
+
+================================================================================
+10 — CHECKLIST DE IMPLEMENTACIÓN POR PANTALLA
+================================================================================
+
+  Antes de considerar una pantalla como "lista", verificar:
+
+  [ ] El btn-primary es único y visible sin hacer scroll
+  [ ] Los estados vacíos están diseñados e implementados
+  [ ] El feedback de loading está implementado en todas las acciones async
+  [ ] Los toasts de éxito y error funcionan
+  [ ] El copy usa voseo y sigue el tono de marca
+  [ ] Los colores usan los tokens exactos del manual (no aproximaciones)
+  [ ] La tipografía usa Plus Jakarta Sans con los weights correctos
+  [ ] El touch target mínimo es 44×44px en mobile
+  [ ] Los focus states son visibles (accesibilidad teclado)
+  [ ] El componente funciona en ancho 375px (iPhone SE) y 390px (iPhone 14)
+
+
+================================================================================
+NOTAS FINALES
+================================================================================
+
+  Este documento cubre los flujos principales del MVP. Está listo para usarse
+  como brief con un diseñador en Figma, como referencia para un desarrollador
+  implementando componentes, o como input para un agente de IA generando
+  código de interfaz.
+
+  Las decisiones de stack (React Native, Flutter, Next.js) no están incluidas
+  aquí porque aún no están definidas — este prompt es agnóstico a la tecnología
+  y aplica a cualquier plataforma.
+
+================================================================================
+Bookzi Design System · Prompt UX/UI v1.0 · Basado en Brand Manual v1.0
+Mercado: Argentina / Uruguay · Idioma UI: Español rioplatense
+================================================================================

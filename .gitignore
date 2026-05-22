@@ -41,3 +41,5 @@ pnpm-debug.log*
 # Misc
 *.pem
 *.key
+.vercel
+.claude/settings.local.json

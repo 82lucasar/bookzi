@@ -1,0 +1,7 @@
+{
+  "buildCommand": "pnpm turbo build --filter=@bookzi/web",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": "nextjs",
+  "rewrites": [{ "source": "/(.*)", "destination": "/$1" }]
+}

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation"
 import { getBookingBusiness } from "@/lib/actions/booking"
 import BookingClient from "./BookingClient"
 
+export const dynamic = "force-dynamic"
+
 export default async function BookServicePage({
   params,
 }: {
