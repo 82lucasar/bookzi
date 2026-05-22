@@ -43,7 +43,11 @@
       "Bash(git commit *)",
       "Bash(PATH=/Users/lucasarroyo/Library/pnpm/bin:__TRACKED_VAR__ DATABASE_URL='postgresql://neondb_owner:npg_f0oMHT5UBqis@ep-curly-hill-acby5aof-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' /Users/lucasarroyo/Library/pnpm/bin/pnpm db:push)",
       "Bash(PATH=/Users/lucasarroyo/Library/pnpm/bin:__TRACKED_VAR__ /Users/lucasarroyo/Library/pnpm/bin/pnpm turbo typecheck --force)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(PATH=/Users/lucasarroyo/Library/pnpm/bin:__TRACKED_VAR__ /Users/lucasarroyo/Library/pnpm/bin/pnpm add --filter @bookzi/web @bookzi/db drizzle-orm @neondatabase/serverless)",
+      "Bash(PATH=/Users/lucasarroyo/Library/pnpm/bin:__TRACKED_VAR__ /Users/lucasarroyo/Library/pnpm/bin/pnpm install)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(PATH=/Users/lucasarroyo/Library/pnpm/bin:__TRACKED_VAR__ NEXT_PUBLIC_SUPABASE_URL=https://ukaempboazvlivvsnoln.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_0gJyxggbwez5jbsMPgQjuA_fiITRCwD DATABASE_URL='postgresql://neondb_owner:npg_f0oMHT5UBqis@ep-curly-hill-acby5aof-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' /Users/lucasarroyo/Library/pnpm/bin/pnpm dev)"
     ]
   }
 }

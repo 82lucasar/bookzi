@@ -10,8 +10,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@bookzi/db": "workspace:*",
     "@bookzi/shared": "workspace:*",
     "@bookzi/ui": "workspace:*",
+    "drizzle-orm": "^0.38.3",
+    "@neondatabase/serverless": "^0.10.4",
     "@hookform/resolvers": "^3.9.1",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.1",

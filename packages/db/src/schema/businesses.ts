@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm"
 
 export const businesses = pgTable("businesses", {
   id:                       uuid("id").primaryKey().defaultRandom(),
+  ownerId:                  uuid("owner_id").notNull(),
   name:                     varchar("name", { length: 255 }).notNull(),
   slug:                     varchar("slug", { length: 100 }).notNull().unique(),
   category:                 varchar("category", { length: 100 }),
