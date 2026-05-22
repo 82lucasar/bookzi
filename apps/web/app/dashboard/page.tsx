@@ -30,7 +30,7 @@ export default async function DashboardPage() {
             <svg viewBox="0 0 18 18" fill="none"><rect x="1" y="3" width="16" height="13" rx="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 1v3M13 1v3M1 8h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             Agenda
           </Link>
-          <Link href="/dashboard/appointments" className="sidebar-link">
+          <Link href="/dashboard/appointments/new" className="sidebar-link">
             <svg viewBox="0 0 18 18" fill="none"><path d="M2 4h14M2 9h9M2 14h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             Turnos
           </Link>
