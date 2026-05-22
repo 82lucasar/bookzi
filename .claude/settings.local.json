@@ -34,7 +34,15 @@
       "Read(//Users/lucasarroyo/.config/gh/**)",
       "Bash(git config *)",
       "Bash(git remote *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git restore *)",
+      "Bash(git rm *)",
+      "Bash(git commit *)",
+      "Bash(PATH=/Users/lucasarroyo/Library/pnpm/bin:__TRACKED_VAR__ DATABASE_URL='postgresql://neondb_owner:npg_f0oMHT5UBqis@ep-curly-hill-acby5aof-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' /Users/lucasarroyo/Library/pnpm/bin/pnpm db:push)",
+      "Bash(PATH=/Users/lucasarroyo/Library/pnpm/bin:__TRACKED_VAR__ /Users/lucasarroyo/Library/pnpm/bin/pnpm turbo typecheck --force)"
     ]
   }
 }

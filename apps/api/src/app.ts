@@ -2,6 +2,8 @@ import Fastify from "fastify"
 import cors from "@fastify/cors"
 import helmet from "@fastify/helmet"
 import rateLimit from "@fastify/rate-limit"
+import sensible from "@fastify/sensible"
+import authPlugin from "./plugins/auth.js"
 
 export async function buildApp() {
   const app = Fastify({
@@ -10,6 +12,7 @@ export async function buildApp() {
     },
   })
 
+  await app.register(sensible)
   await app.register(helmet)
 
   await app.register(cors, {
@@ -24,6 +27,8 @@ export async function buildApp() {
     max: 100,
     timeWindow: "1 minute",
   })
+
+  await app.register(authPlugin)
 
   app.get("/health", async () => ({
     status: "ok",
