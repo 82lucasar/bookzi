@@ -2,8 +2,8 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
 import { db } from "@bookzi/db"
-import { appointments } from "@bookzi/db/schema"
-import { eq, and, gte, lt, count } from "drizzle-orm"
+import { appointments, services } from "@bookzi/db/schema"
+import { eq, and, gte, lt, count, isNull } from "drizzle-orm"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -36,10 +36,19 @@ export default async function DashboardPage() {
       lt(appointments.startAt, weekEnd),
     ))
 
+  const [serviceCount] = await db
+    .select({ count: count() })
+    .from(services)
+    .where(and(
+      eq(services.businessId, business.id),
+      eq(services.isActive, true),
+      isNull(services.deletedAt),
+    ))
+
   const stats = [
     { label: "Turnos de hoy", value: todayCount?.count ?? 0 },
     { label: "Esta semana", value: weekCount?.count ?? 0 },
-    { label: "Servicios activos", value: "—" },
+    { label: "Servicios activos", value: serviceCount?.count ?? 0 },
   ]
 
   return (
