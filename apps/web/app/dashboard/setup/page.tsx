@@ -1,79 +1,76 @@
 import { createBusiness } from "@/lib/actions/business"
+import SetupDurationPicker from "./SetupDurationPicker"
+import Link from "next/link"
 
 const CATEGORIES = [
-  "Peluquería y estética",
-  "Salud y bienestar",
-  "Odontología",
+  "Medicina / Salud",
+  "Peluquería / Estética",
   "Psicología",
+  "Entrenamiento personal",
+  "Odontología",
   "Nutrición",
-  "Educación y clases",
-  "Consultoría",
+  "Gimnasio",
+  "Pádel",
+  "Tenis",
+  "Fútbol",
   "Otro",
 ]
 
 export default function SetupPage() {
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-[var(--color-border)] p-8">
-        <div className="mb-6">
-          <span className="text-2xl font-extrabold text-[var(--color-primary)]">Bookzi</span>
-          <h1 className="text-xl font-bold text-[var(--color-text-dark)] mt-3">
-            Configurá tu negocio
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            Completá los datos para empezar a recibir turnos.
-          </p>
+    <div className="ob-screen">
+      <div className="ob-header">
+        <Link href="/onboarding/welcome" className="ob-back-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </Link>
+        <span className="step-label">Paso 1 de 3</span>
+      </div>
+
+      <div className="progress-wrap">
+        <div className="progress-bar">
+          <div className="progress-fill" style={{ width: "33%" }}></div>
+        </div>
+      </div>
+
+      <form action={createBusiness} className="ob-body">
+        <div>
+          <h1 className="ob-title">¿Cómo se llama<br/>tu negocio?</h1>
+          <p className="ob-subtitle">Esto va a aparecer en tu página de reservas.</p>
         </div>
 
-        <form action={createBusiness} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-              Nombre del negocio <span className="text-[var(--color-error)]">*</span>
-            </label>
+        <div className="form-stack">
+          <div className="form-group">
+            <label className="form-label">Nombre del negocio *</label>
             <input
-              name="name"
+              className="form-input"
               type="text"
+              name="name"
+              placeholder="Ej: Centro Médico Martina López"
               required
-              placeholder="Ej: Peluquería Sol"
-              className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-              Rubro
-            </label>
-            <select
-              name="category"
-              className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
-            >
-              <option value="">Seleccioná un rubro</option>
-              {CATEGORIES.map((c) => (
+          <div className="form-group">
+            <label className="form-label">Rubro</label>
+            <select className="form-select" name="category">
+              <option value="" disabled>Seleccioná tu rubro</option>
+              {CATEGORIES.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-              Teléfono de contacto
-            </label>
-            <input
-              name="phone"
-              type="tel"
-              placeholder="Ej: +54 9 11 1234-5678"
-              className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-            />
-          </div>
+          <SetupDurationPicker />
+        </div>
 
-          <button
-            type="submit"
-            className="mt-2 h-10 rounded-lg bg-[var(--color-primary)] text-white font-semibold text-sm hover:bg-[var(--color-primary-dark)] transition-colors"
-          >
-            Crear mi negocio →
+        <div className="ob-footer">
+          <button type="submit" className="btn btn-primary btn-full btn-lg">
+            Siguiente
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   )
 }

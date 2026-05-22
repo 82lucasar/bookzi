@@ -56,5 +56,5 @@ export async function createBusiness(formData: FormData) {
     phone: phone || null,
   })
 
-  redirect("/dashboard")
+  redirect("/onboarding/availability")
 }

@@ -15,25 +15,18 @@ export default async function AvailabilityPage() {
   const schedule = await getAvailability()
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)]">
-      <header className="bg-white border-b border-[var(--color-border)] px-6 py-4 flex items-center gap-3">
-        <a href="/dashboard" className="text-xl font-extrabold text-[var(--color-primary)]">Bookzi</a>
-        <span className="text-[var(--color-border)]">/</span>
-        <span className="text-sm font-medium text-[var(--color-text-dark)]">Disponibilidad</span>
-      </header>
+    <div>
+      {/* Page header */}
+      <div className="bg-white border-b border-[var(--color-border)] px-6 lg:px-10 py-6">
+        <h1 className="text-2xl font-extrabold text-[var(--color-text-dark)]">Horarios de atención</h1>
+        <p className="text-sm text-[var(--color-text-muted)] mt-0.5">
+          Configurá los días y horarios en que tu negocio acepta reservas
+        </p>
+      </div>
 
-      <main className="max-w-2xl mx-auto px-6 py-10">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[var(--color-text-dark)]">
-            Horarios de atención
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            Configurá los días y horarios en que tu negocio acepta turnos.
-          </p>
-        </div>
-
+      <div className="px-6 lg:px-10 py-8 max-w-2xl">
         <AvailabilityForm initial={schedule} />
-      </main>
+      </div>
     </div>
   )
 }

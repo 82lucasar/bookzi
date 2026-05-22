@@ -12,111 +12,137 @@ const DURATIONS = [
 
 export default function NewServicePage() {
   return (
-    <div className="min-h-screen bg-[var(--color-bg)]">
-      <header className="bg-white border-b border-[var(--color-border)] px-6 py-4 flex items-center gap-3">
-        <a href="/dashboard/services" className="text-[var(--color-text-muted)] hover:text-[var(--color-text-dark)] text-sm">
-          ← Servicios
+    <div className="min-h-screen">
+
+      {/* Page header */}
+      <div
+        className="bg-white px-6 lg:px-10 py-6 flex items-center gap-3"
+        style={{ borderBottom: "1.5px solid var(--color-border)" }}
+      >
+        <a
+          href="/dashboard/services"
+          className="flex items-center gap-2 text-sm font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m7-7l-7 7 7 7" />
+          </svg>
+          Servicios
         </a>
-        <span className="text-[var(--color-border)]">/</span>
-        <span className="text-sm font-medium text-[var(--color-text-dark)]">Nuevo servicio</span>
-      </header>
+        <span style={{ color: "var(--color-border)" }}>/</span>
+        <span className="text-sm font-bold text-[var(--color-text-dark)]">Nuevo servicio</span>
+      </div>
 
-      <main className="max-w-lg mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-[var(--color-text-dark)] mb-6">
-          Agregar servicio
-        </h1>
+      <div className="px-6 lg:px-10 py-8 max-w-lg">
+        <div className="mb-7">
+          <h1 className="text-2xl font-extrabold text-[var(--color-text-dark)]" style={{ letterSpacing: "-0.5px" }}>
+            Agregar servicio
+          </h1>
+          <p className="text-sm text-[var(--color-text-muted)] mt-1">
+            Completá los datos del servicio que querés ofrecer.
+          </p>
+        </div>
 
-        <form action={createService} className="bg-white rounded-2xl border border-[var(--color-border)] p-6 flex flex-col gap-5">
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-              Nombre del servicio <span className="text-[var(--color-error)]">*</span>
-            </label>
-            <input
-              name="name"
-              type="text"
-              required
-              placeholder="Ej: Corte de pelo"
-              className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-              Descripción
-            </label>
-            <textarea
-              name="description"
-              rows={3}
-              placeholder="Ej: Incluye lavado y secado"
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] resize-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-                Duración <span className="text-[var(--color-error)]">*</span>
-              </label>
-              <select
-                name="durationMinutes"
-                required
-                className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
-              >
-                {DURATIONS.map((d) => (
-                  <option key={d.value} value={d.value}>{d.label}</option>
-                ))}
-              </select>
-            </div>
+        <form action={createService} className="bg-white rounded-3xl shadow-sm overflow-hidden" style={{ border: "1.5px solid var(--color-border)" }}>
+          <div className="p-7 flex flex-col gap-6">
 
             <div>
-              <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-                Pausa entre turnos
+              <label className="block text-sm font-bold text-[var(--color-text-mid)] mb-2.5">
+                Nombre del servicio <span className="text-[var(--color-error)]">*</span>
               </label>
-              <select
-                name="bufferMinutes"
-                className="w-full h-10 px-3 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white"
-              >
-                <option value={0}>Sin pausa</option>
-                <option value={10}>10 minutos</option>
-                <option value={15}>15 minutos</option>
-                <option value={30}>30 minutos</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-mid)] mb-1">
-              Precio (ARS)
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--color-text-muted)]">$</span>
               <input
-                name="price"
-                type="number"
-                min="0"
-                step="100"
-                placeholder="0"
-                className="w-full h-10 pl-7 pr-3 rounded-lg border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                name="name"
+                type="text"
+                required
+                placeholder="Ej: Corte de pelo"
               />
             </div>
+
+            <div>
+              <label className="block text-sm font-bold text-[var(--color-text-mid)] mb-2.5">
+                Descripción <span className="text-xs font-medium text-[var(--color-text-muted)]">(opcional)</span>
+              </label>
+              <textarea
+                name="description"
+                rows={3}
+                placeholder="Ej: Incluye lavado y secado con blow dry"
+              />
+              <p className="text-xs text-[var(--color-text-muted)] mt-2">Tus clientes verán esta descripción al reservar.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-bold text-[var(--color-text-mid)] mb-2.5">
+                  Duración <span className="text-[var(--color-error)]">*</span>
+                </label>
+                <select name="durationMinutes" required>
+                  {DURATIONS.map((d) => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[var(--color-text-mid)] mb-2.5">
+                  Pausa entre turnos
+                </label>
+                <select name="bufferMinutes">
+                  <option value={0}>Sin pausa</option>
+                  <option value={10}>10 min</option>
+                  <option value={15}>15 min</option>
+                  <option value={30}>30 min</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-[var(--color-text-mid)] mb-2.5">
+                Precio <span className="text-xs font-medium text-[var(--color-text-muted)]">(ARS, opcional)</span>
+              </label>
+              <div className="relative">
+                <span
+                  className="absolute left-5 top-1/2 -translate-y-1/2 font-extrabold pointer-events-none text-[var(--color-text-muted)]"
+                  style={{ fontSize: 15 }}
+                >
+                  $
+                </span>
+                <input
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="100"
+                  placeholder="0"
+                  style={{ paddingLeft: "2.25rem" }}
+                />
+              </div>
+              <p className="text-xs text-[var(--color-text-muted)] mt-2">Dejalo en 0 si no querés mostrar precio.</p>
+            </div>
           </div>
 
-          <div className="flex gap-3 pt-2">
+          {/* Footer del form */}
+          <div
+            className="px-7 py-5 flex gap-3"
+            style={{ borderTop: "1.5px solid var(--color-border)", background: "var(--color-bg)" }}
+          >
             <a
               href="/dashboard/services"
-              className="flex-1 h-10 rounded-lg border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-mid)] flex items-center justify-center hover:bg-[var(--color-bg)] transition-colors"
+              className="flex-1 h-12 rounded-2xl font-bold text-sm flex items-center justify-center transition-all hover:bg-white"
+              style={{ border: "1.5px solid var(--color-border)", color: "var(--color-text-mid)" }}
             >
               Cancelar
             </a>
             <button
               type="submit"
-              className="flex-1 h-10 rounded-lg bg-[var(--color-primary)] text-white font-semibold text-sm hover:bg-[var(--color-primary-dark)] transition-colors"
+              className="flex-1 h-12 rounded-2xl font-bold text-sm text-white transition-all hover:shadow-lg"
+              style={{
+                background: "linear-gradient(135deg, #0284C7, #0369A1)",
+                boxShadow: "0 2px 10px rgba(2,132,199,0.3)",
+              }}
             >
               Guardar servicio
             </button>
           </div>
         </form>
-      </main>
+      </div>
     </div>
   )
 }
