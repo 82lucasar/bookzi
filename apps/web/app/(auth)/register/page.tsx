@@ -35,7 +35,7 @@ const FEATURES = [
       </svg>
     ),
     title: "Confirmaciones por WhatsApp",
-    desc: "Recordatorios automáticos. Menos no-shows, más plata.",
+    desc: "Recordatorios automáticos. Menos no, menos shows. Más plata.",
   },
   {
     icon: (
@@ -44,7 +44,7 @@ const FEATURES = [
       </svg>
     ),
     title: "Estadísticas en tiempo real",
-    desc: "Sabé cuántos turnos tuviste y cuánta guita generaste.",
+    desc: "Sabé cuántos turnos tuviste y cuánto facturaste.",
   },
 ]
 
