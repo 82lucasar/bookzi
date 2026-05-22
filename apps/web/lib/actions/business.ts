@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { db } from "@bookzi/db"
-import { businesses } from "@bookzi/db/schema"
+import { businesses, staff } from "@bookzi/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function getMyBusiness() {
@@ -37,13 +37,23 @@ export async function createBusiness(formData: FormData) {
     .replace(/(^-|-$)/g, "")
     .slice(0, 80)
 
-  await db.insert(businesses).values({
+  const result = await db.insert(businesses).values({
     ownerId: user.id,
     name,
     slug: `${slug}-${Math.random().toString(36).slice(2, 6)}`,
     category: category || null,
     phone: phone || null,
     email: user.email ?? null,
+  }).returning()
+
+  const business = result[0]!
+
+  // Staff por defecto — representa al dueño del negocio
+  await db.insert(staff).values({
+    businessId: business.id,
+    name,
+    email: user.email ?? null,
+    phone: phone || null,
   })
 
   redirect("/dashboard")
