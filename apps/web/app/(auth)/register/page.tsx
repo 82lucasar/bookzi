@@ -59,29 +59,64 @@ export default function RegisterPage() {
   const [terms,     setTerms]     = useState(false)
   const [error,     setError]     = useState<string | null>(null)
   const [loading,   setLoading]   = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
     if (!terms) { setError("Tenés que aceptar los términos para continuar."); return }
     setLoading(true)
     setError(null)
-    const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-          category,
-          business_name: `${firstName} ${lastName}`,
-        },
-      },
-    })
-    if (error) { setError(error.message); setLoading(false); return }
-    router.push("/onboarding/welcome")
-    router.refresh()
+
+    try {
+      const supabase = createClient()
+
+      const { data, error } = await Promise.race([
+        supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              phone,
+              category,
+              business_name: `${firstName} ${lastName}`,
+            },
+          },
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("La conexión tardó demasiado. Revisá tu conexión e intentá de nuevo.")), 15000)
+        ),
+      ])
+
+      if (error) {
+        const msg =
+          error.message.toLowerCase().includes("rate limit") ||
+          error.message.includes("429")
+            ? "Demasiados intentos. Esperá unos minutos antes de intentar de nuevo."
+            : error.message.toLowerCase().includes("already registered") ||
+              error.message.toLowerCase().includes("already been registered")
+            ? "Ese email ya está registrado. ¿Querés ingresar?"
+            : error.message
+        setError(msg)
+        setLoading(false)
+        return
+      }
+
+      // Si hay sesión activa, el email confirmation está desactivado → ir directo
+      if (data?.session) {
+        router.push("/onboarding/welcome")
+        router.refresh()
+        return
+      }
+
+      // Sin sesión = requiere confirmación por email
+      setConfirmed(true)
+      setLoading(false)
+    } catch (err: any) {
+      setError(err.message || "Ocurrió un error inesperado. Intentá de nuevo.")
+      setLoading(false)
+    }
   }
 
   async function handleGoogle() {
@@ -193,6 +228,39 @@ export default function RegisterPage() {
             <span style={{ fontSize: 18, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.4px" }}>Bookzi</span>
           </div>
 
+          {confirmed ? (
+            <div style={{ textAlign: "center", padding: "24px 0" }}>
+              <div style={{
+                width: 72, height: 72, borderRadius: "50%",
+                background: "rgba(5,150,105,0.10)", border: "2px solid rgba(5,150,105,0.25)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 24px",
+              }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h2 style={{ fontSize: 24, fontWeight: 900, color: "#0F172A", marginBottom: 12, letterSpacing: "-0.5px" }}>
+                ¡Cuenta creada!
+              </h2>
+              <p style={{ color: "#64748B", fontSize: 15, lineHeight: 1.6, marginBottom: 8 }}>
+                Te enviamos un email de confirmación a
+              </p>
+              <p style={{ color: "#0284C7", fontWeight: 700, fontSize: 15, marginBottom: 24 }}>{email}</p>
+              <p style={{ color: "#64748B", fontSize: 14, lineHeight: 1.6, marginBottom: 32 }}>
+                Hacé click en el link del email para activar tu cuenta y empezar a usar Bookzi.
+              </p>
+              <a href="/login" style={{
+                display: "block", height: 52, lineHeight: "52px",
+                borderRadius: 12, background: "#0284C7", color: "white",
+                fontWeight: 800, fontSize: 16, textDecoration: "none", textAlign: "center",
+              }}>
+                Ir al inicio de sesión
+              </a>
+              <p style={{ color: "#94A3B8", fontSize: 13, marginTop: 16 }}>
+                ¿No llegó el email? Revisá la carpeta de spam.
+              </p>
+            </div>
+          ) : (
+          <>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: "#0F172A", marginBottom: 8, letterSpacing: "-0.7px" }}>
             Creá tu cuenta gratis
           </h1>
@@ -346,6 +414,8 @@ export default function RegisterPage() {
               Ingresá acá
             </a>
           </p>
+          </>
+          )}
 
         </div>
       </div>
