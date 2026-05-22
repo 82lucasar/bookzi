@@ -88,16 +88,33 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl border border-[var(--color-border)] p-8 text-center">
-          <p className="text-[var(--color-text-muted)] text-sm mb-4">
-            Tu agenda está lista. Próximamente vas a poder agregar servicios y ver los turnos acá.
-          </p>
-          <a
-            href="/dashboard/services/new"
-            className="inline-flex items-center h-10 px-5 rounded-lg bg-[var(--color-primary)] text-white font-semibold text-sm hover:bg-[var(--color-primary-dark)] transition-colors"
-          >
-            + Agregar primer servicio
-          </a>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            {
+              href: "/dashboard/services",
+              title: "Servicios",
+              desc: "Administrá los servicios que ofrecés y sus precios.",
+              icon: "✂️",
+            },
+            {
+              href: "/dashboard/availability",
+              title: "Horarios",
+              desc: "Configurá los días y horarios de atención.",
+              icon: "🕐",
+            },
+          ].map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="bg-white rounded-2xl border border-[var(--color-border)] p-6 hover:border-[var(--color-primary)] hover:shadow-sm transition-all group"
+            >
+              <span className="text-2xl">{item.icon}</span>
+              <p className="font-semibold text-[var(--color-text-dark)] mt-2 group-hover:text-[var(--color-primary)]">
+                {item.title}
+              </p>
+              <p className="text-sm text-[var(--color-text-muted)] mt-0.5">{item.desc}</p>
+            </a>
+          ))}
         </div>
       </main>
     </div>
