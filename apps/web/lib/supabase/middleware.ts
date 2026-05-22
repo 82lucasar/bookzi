@@ -2,12 +2,17 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.next({ request })
+  }
+
+  try {
+    let supabaseResponse = NextResponse.next({ request })
+
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll()
@@ -22,26 +27,28 @@ export async function updateSession(request: NextRequest) {
           )
         },
       },
+    })
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
+      request.nextUrl.pathname.startsWith("/register")
+    const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard")
+
+    if (!user && isProtectedRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/login"
+      return NextResponse.redirect(url)
     }
-  )
 
-  const { data: { user } } = await supabase.auth.getUser()
+    if (user && isAuthRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/dashboard"
+      return NextResponse.redirect(url)
+    }
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/register")
-  const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard")
-
-  if (!user && isProtectedRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/login"
-    return NextResponse.redirect(url)
+    return supabaseResponse
+  } catch {
+    return NextResponse.next({ request })
   }
-
-  if (user && isAuthRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/dashboard"
-    return NextResponse.redirect(url)
-  }
-
-  return supabaseResponse
 }
