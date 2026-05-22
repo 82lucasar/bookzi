@@ -88,8 +88,14 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
+            {
+              href: "/dashboard/appointments",
+              title: "Turnos",
+              desc: "Confirmá o cancelá los turnos de tus clientes.",
+              icon: "📅",
+            },
             {
               href: "/dashboard/services",
               title: "Servicios",
