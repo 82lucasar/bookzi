@@ -36,7 +36,8 @@ export async function getAvailableSlots(
   serviceId: string,
   dateStr: string, // YYYY-MM-DD
 ): Promise<string[]> {
-  const date = new Date(`${dateStr}T00:00:00`)
+  // Usar mediodía local para evitar problemas de cruce de día con UTC
+  const date = new Date(`${dateStr}T12:00:00-03:00`)
   const dayOfWeek = DAY_MAP[date.getDay()]
 
   // Disponibilidad del negocio para ese día
@@ -84,9 +85,17 @@ export async function getAvailableSlots(
   const startTotal = (startParts[0] ?? 9) * 60 + (startParts[1] ?? 0)
   const endTotal = (endParts[0] ?? 18) * 60 + (endParts[1] ?? 0)
 
+  // Usar zona horaria de Argentina (UTC-3, sin DST) para comparar "hoy" y hora actual
+  const TZ = "America/Argentina/Buenos_Aires"
   const now = new Date()
-  const isToday = dateStr === now.toISOString().slice(0, 10)
-  const nowMinutes = isToday ? now.getHours() * 60 + now.getMinutes() + 60 : 0
+  const todayLocal = now.toLocaleDateString("en-CA", { timeZone: TZ }) // "YYYY-MM-DD"
+  const isToday = dateStr === todayLocal
+  const nowMinutes = isToday ? (() => {
+    // Hora local Argentina para filtrar slots ya pasados
+    const localStr = now.toLocaleString("en-US", { timeZone: TZ })
+    const localNow = new Date(localStr)
+    return localNow.getHours() * 60 + localNow.getMinutes() + 60 // +60 min buffer
+  })() : 0
 
   const slots: string[] = []
 
