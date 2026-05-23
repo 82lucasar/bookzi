@@ -36,8 +36,8 @@ export async function getAvailability(): Promise<DayConfig[]> {
     return {
       day,
       isActive: row?.isActive ?? false,
-      startTime: row?.startTime ?? "09:00",
-      endTime: row?.endTime ?? "18:00",
+      startTime: (row?.startTime ?? "09:00").slice(0, 5),
+      endTime: (row?.endTime ?? "18:00").slice(0, 5),
     }
   })
 }
