@@ -3,33 +3,36 @@
 import { useState } from "react"
 import { saveAvailability, type DayConfig } from "@/lib/actions/availability"
 
-const DAY_LABELS: Record<string, string> = {
-  monday: "Lunes", tuesday: "Martes", wednesday: "Miércoles",
-  thursday: "Jueves", friday: "Viernes", saturday: "Sábado", sunday: "Domingo",
-}
+const DAYS_LIST = [
+  { key: "monday",    label: "Lunes" },
+  { key: "tuesday",   label: "Martes" },
+  { key: "wednesday", label: "Miércoles" },
+  { key: "thursday",  label: "Jueves" },
+  { key: "friday",    label: "Viernes" },
+  { key: "saturday",  label: "Sábado" },
+  { key: "sunday",    label: "Domingo" },
+]
 
-const DAY_ABBR: Record<string, string> = {
-  monday: "Lun", tuesday: "Mar", wednesday: "Mié",
-  thursday: "Jue", friday: "Vie", saturday: "Sáb", sunday: "Dom",
-}
-
-const TIMES = Array.from({ length: 29 }, (_, i) => {
-  const t = 7 * 60 + i * 30
-  return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`
+// 07:00 → 22:30 en pasos de 30 min
+const TIMES = Array.from({ length: 32 }, (_, i) => {
+  const total = 7 * 60 + i * 30
+  const h = String(Math.floor(total / 60)).padStart(2, "0")
+  const m = String(total % 60).padStart(2, "0")
+  return `${h}:${m}`
 })
 
 export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) {
-  const [schedule, setSchedule] = useState(initial)
-  const [saved, setSaved] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const [schedule, setSchedule] = useState<DayConfig[]>(initial)
+  const [saved,    setSaved]    = useState(false)
+  const [saving,   setSaving]   = useState(false)
 
   function toggle(day: string) {
-    setSchedule((s) => s.map((d) => d.day === day ? { ...d, isActive: !d.isActive } : d))
+    setSchedule(s => s.map(d => d.day === day ? { ...d, isActive: !d.isActive } : d))
     setSaved(false)
   }
 
   function setTime(day: string, field: "startTime" | "endTime", value: string) {
-    setSchedule((s) => s.map((d) => d.day === day ? { ...d, [field]: value } : d))
+    setSchedule(s => s.map(d => d.day === day ? { ...d, [field]: value } : d))
     setSaved(false)
   }
 
@@ -47,95 +50,140 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
     setSaving(false)
   }
 
-  const activeDays = schedule.filter((d) => d.isActive).length
+  const selectStyle: React.CSSProperties = {
+    height: 42,
+    borderRadius: 10,
+    border: "1.5px solid var(--color-border, #E0F0F8)",
+    background: "white",
+    color: "var(--color-text-dark, #0F172A)",
+    fontSize: 14,
+    fontWeight: 600,
+    padding: "0 10px",
+    fontFamily: "inherit",
+    cursor: "pointer",
+    outline: "none",
+    minWidth: 90,
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Info */}
-      <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-sm overflow-hidden mb-4">
-        <div className="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
-          <div>
-            <p className="font-bold text-[var(--color-text-dark)]">Días y horarios</p>
-            <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-              {activeDays === 0 ? "Ningún día activo" : `${activeDays} día${activeDays !== 1 ? "s" : ""} activo${activeDays !== 1 ? "s" : ""}`}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {schedule.map((d) => (
-              <span
-                key={d.day}
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                style={d.isActive
-                  ? { background: "rgba(2,132,199,0.12)", color: "var(--color-primary)" }
-                  : { background: "var(--color-bg)", color: "var(--color-border)" }
-                }
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+
+      {DAYS_LIST.map(({ key, label }) => {
+        const day = schedule.find(d => d.day === key)!
+        return (
+          <div
+            key={key}
+            style={{
+              background: day.isActive ? "white" : "#F8FAFC",
+              border: `1.5px solid ${day.isActive ? "var(--color-border, #E0F0F8)" : "#E2E8F0"}`,
+              borderRadius: 14,
+              padding: "14px 16px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              transition: "background 150ms, border-color 150ms",
+            }}
+          >
+            {/* Fila superior: checkbox + nombre del día */}
+            <label style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              cursor: "pointer",
+              userSelect: "none",
+            }}>
+              {/* Checkbox custom */}
+              <div
+                onClick={() => toggle(key)}
+                style={{
+                  width: 22, height: 22,
+                  borderRadius: 6,
+                  border: `2px solid ${day.isActive ? "var(--color-primary, #0284C7)" : "#CBD5E1"}`,
+                  background: day.isActive ? "var(--color-primary, #0284C7)" : "white",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                  transition: "all 150ms",
+                  cursor: "pointer",
+                }}
               >
-                {DAY_ABBR[d.day]}
+                {day.isActive && (
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                    <path d="M2 7l3.5 3.5L11 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+
+              <span style={{
+                fontSize: 15,
+                fontWeight: 700,
+                color: day.isActive ? "var(--color-text-dark, #0F172A)" : "#94A3B8",
+                transition: "color 150ms",
+              }}>
+                {label}
               </span>
-            ))}
-          </div>
-        </div>
 
-        <div className="divide-y divide-[var(--color-border)]">
-          {schedule.map(({ day, isActive, startTime, endTime }) => (
-            <div
-              key={day}
-              className={`flex items-center gap-4 px-5 py-4 transition-colors ${
-                isActive ? "bg-white" : "bg-[var(--color-bg)]"
-              }`}
-            >
-              {/* Toggle + Label */}
-              <label className="flex items-center gap-3 cursor-pointer select-none w-32 shrink-0">
-                <div
-                  onClick={() => toggle(day)}
-                  className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${
-                    isActive ? "bg-[var(--color-primary)]" : "bg-[var(--color-border)]"
-                  }`}
-                >
-                  <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
-                    isActive ? "translate-x-5" : "translate-x-0.5"
-                  }`} />
-                </div>
-                <span className={`text-sm font-bold ${isActive ? "text-[var(--color-text-dark)]" : "text-[var(--color-text-muted)]"}`}>
-                  {DAY_LABELS[day]}
+              {!day.isActive && (
+                <span style={{
+                  marginLeft: "auto",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "#94A3B8",
+                }}>
+                  No disponible
                 </span>
-              </label>
+              )}
+            </label>
 
-              {/* Horarios */}
-              {isActive ? (
-                <div className="flex items-center gap-2 ml-auto">
+            {/* Fila inferior: selectores de horario (solo si activo) */}
+            {day.isActive && (
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                paddingLeft: 34,
+                flexWrap: "wrap",
+              }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Desde
+                  </span>
                   <select
-                    value={startTime}
-                    onChange={(e) => setTime(day, "startTime", e.target.value)}
-                    className="text-sm font-semibold rounded-xl border border-[var(--color-border)] bg-white py-1.5 px-3 focus:outline-none focus:border-[var(--color-primary)]"
-                    style={{ width: "auto" }}
+                    value={day.startTime}
+                    onChange={e => setTime(key, "startTime", e.target.value)}
+                    style={selectStyle}
                   >
-                    {TIMES.map((t) => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                  <span className="text-xs font-bold text-[var(--color-text-muted)]">a</span>
-                  <select
-                    value={endTime}
-                    onChange={(e) => setTime(day, "endTime", e.target.value)}
-                    className="text-sm font-semibold rounded-xl border border-[var(--color-border)] bg-white py-1.5 px-3 focus:outline-none focus:border-[var(--color-primary)]"
-                    style={{ width: "auto" }}
-                  >
-                    {TIMES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
-              ) : (
-                <span className="ml-auto text-xs text-[var(--color-text-muted)] font-medium">No disponible</span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Submit */}
-      <div className="flex items-center justify-between">
+                <div style={{ alignSelf: "flex-end", paddingBottom: 10, color: "#94A3B8", fontWeight: 700, fontSize: 16 }}>
+                  —
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Hasta
+                  </span>
+                  <select
+                    value={day.endTime}
+                    onChange={e => setTime(key, "endTime", e.target.value)}
+                    style={selectStyle}
+                  >
+                    {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })}
+
+      {/* Botón guardar */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
         {saved && (
-          <div className="flex items-center gap-2 text-sm font-bold text-[var(--color-accent)]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 700, color: "#059669" }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Horarios guardados
           </div>
@@ -143,10 +191,20 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
         <button
           type="submit"
           disabled={saving}
-          className="ml-auto h-11 px-7 rounded-xl font-bold text-sm text-white transition-all"
           style={{
+            marginLeft: "auto",
+            height: 44,
+            padding: "0 28px",
+            borderRadius: 12,
+            border: "none",
             background: saving ? "#0369A1" : "linear-gradient(135deg, #0284C7, #0369A1)",
-            boxShadow: "0 2px 8px rgba(2,132,199,0.3)",
+            color: "white",
+            fontWeight: 700,
+            fontSize: 14,
+            fontFamily: "inherit",
+            cursor: saving ? "not-allowed" : "pointer",
+            opacity: saving ? 0.8 : 1,
+            boxShadow: "0 2px 8px rgba(2,132,199,0.30)",
           }}
         >
           {saving ? "Guardando..." : "Guardar horarios"}
