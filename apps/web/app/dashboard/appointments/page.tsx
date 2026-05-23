@@ -11,8 +11,10 @@ const STATUS_CONFIG: Record<string, { label: string; icon: string; bg: string; t
   completed: { label: "Completado", icon: "—",  bg: "rgba(100,116,139,0.08)", text: "#64748B", border: "rgba(100,116,139,0.15)" },
 }
 
+const TZ = "America/Argentina/Buenos_Aires"
+
 function formatTime(date: Date) {
-  return new Date(date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+  return new Date(date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: TZ })
 }
 
 type Filter = "upcoming" | "today" | "past"

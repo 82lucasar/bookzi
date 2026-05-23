@@ -31,12 +31,13 @@ export default async function AppointmentDetailPage({
 
   const sc = STATUS_CONFIG[appt.status] ?? STATUS_CONFIG.pending!
 
+  const TZ        = "America/Argentina/Buenos_Aires"
   const startDate = new Date(appt.startAt)
-  const day       = startDate.getDate()
-  const month     = startDate.toLocaleDateString("es-AR", { month: "long" })
-  const year      = startDate.getFullYear()
-  const startTime = startDate.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
-  const endTime   = new Date(appt.endAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+  const day       = Number(startDate.toLocaleDateString("en-CA", { day: "numeric", timeZone: TZ }))
+  const month     = startDate.toLocaleDateString("es-AR", { month: "long", timeZone: TZ })
+  const year      = Number(startDate.toLocaleDateString("en-CA", { year: "numeric", timeZone: TZ }))
+  const startTime = startDate.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: TZ })
+  const endTime   = new Date(appt.endAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: TZ })
 
   const initials  = appt.clientName.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()
   const waHref    = appt.clientPhone ? `https://wa.me/${appt.clientPhone.replace(/\D/g, "")}` : null

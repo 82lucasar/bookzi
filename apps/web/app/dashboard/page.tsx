@@ -5,12 +5,14 @@ import { getMyBusiness } from "@/lib/actions/business"
 import { getAppointments } from "@/lib/actions/appointments"
 import Link from "next/link"
 
+const TZ = "America/Argentina/Buenos_Aires"
+
 function formatTime(date: Date) {
-  return date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })
+  return date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: TZ })
 }
 
 function formatDay(date: Date) {
-  return date.toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "")
+  return date.toLocaleDateString("es-AR", { day: "numeric", month: "short", timeZone: TZ }).replace(".", "")
 }
 
 export default async function DashboardPage() {
