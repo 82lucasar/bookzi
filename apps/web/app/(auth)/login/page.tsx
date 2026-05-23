@@ -16,15 +16,25 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError("Email o contraseña incorrectos. Revisá tus datos.")
+    try {
+      const supabase = createClient()
+      const { error } = await Promise.race([
+        supabase.auth.signInWithPassword({ email, password }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("La conexión tardó demasiado. Revisá tu conexión e intentá de nuevo.")), 15000)
+        ),
+      ])
+      if (error) {
+        setError("Email o contraseña incorrectos. Revisá tus datos.")
+        setLoading(false)
+        return
+      }
+      router.push("/dashboard")
+      router.refresh()
+    } catch (err: any) {
+      setError(err.message || "Ocurrió un error. Intentá de nuevo.")
       setLoading(false)
-      return
     }
-    router.push("/dashboard")
-    router.refresh()
   }
 
   return (
