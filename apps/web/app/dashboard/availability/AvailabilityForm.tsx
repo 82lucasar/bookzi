@@ -33,8 +33,15 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
     setSaved(false)
   }
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
     setSaving(true)
+    const formData = new FormData()
+    schedule.forEach(({ day, isActive, startTime, endTime }) => {
+      if (isActive) formData.set(`${day}_active`, "on")
+      formData.set(`${day}_start`, startTime)
+      formData.set(`${day}_end`, endTime)
+    })
     await saveAvailability(formData)
     setSaved(true)
     setSaving(false)
@@ -43,7 +50,7 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
   const activeDays = schedule.filter((d) => d.isActive).length
 
   return (
-    <form action={handleSubmit}>
+    <form onSubmit={handleSubmit}>
       {/* Info */}
       <div className="bg-white rounded-2xl border border-[var(--color-border)] shadow-sm overflow-hidden mb-4">
         <div className="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
@@ -77,8 +84,6 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
                 isActive ? "bg-white" : "bg-[var(--color-bg)]"
               }`}
             >
-              <input type="hidden" name={`${day}_active`} value="off" />
-
               {/* Toggle + Label */}
               <label className="flex items-center gap-3 cursor-pointer select-none w-32 shrink-0">
                 <div
@@ -90,14 +95,6 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
                   <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
                     isActive ? "translate-x-5" : "translate-x-0.5"
                   }`} />
-                  <input
-                    type="checkbox"
-                    name={`${day}_active`}
-                    value="on"
-                    checked={isActive}
-                    onChange={() => toggle(day)}
-                    className="sr-only"
-                  />
                 </div>
                 <span className={`text-sm font-bold ${isActive ? "text-[var(--color-text-dark)]" : "text-[var(--color-text-muted)]"}`}>
                   {DAY_LABELS[day]}
@@ -108,7 +105,6 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
               {isActive ? (
                 <div className="flex items-center gap-2 ml-auto">
                   <select
-                    name={`${day}_start`}
                     value={startTime}
                     onChange={(e) => setTime(day, "startTime", e.target.value)}
                     className="text-sm font-semibold rounded-xl border border-[var(--color-border)] bg-white py-1.5 px-3 focus:outline-none focus:border-[var(--color-primary)]"
@@ -118,7 +114,6 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
                   </select>
                   <span className="text-xs font-bold text-[var(--color-text-muted)]">a</span>
                   <select
-                    name={`${day}_end`}
                     value={endTime}
                     onChange={(e) => setTime(day, "endTime", e.target.value)}
                     className="text-sm font-semibold rounded-xl border border-[var(--color-border)] bg-white py-1.5 px-3 focus:outline-none focus:border-[var(--color-primary)]"
