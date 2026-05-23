@@ -103,10 +103,17 @@ export async function createDashboardAppointment(data: {
     .where(eq(services.id, data.serviceId)).limit(1)
   if (!service) throw new Error("Servicio no encontrado")
 
-  const [defaultStaff] = await db.select().from(staff)
+  const staffRows = await db.select().from(staff)
     .where(and(eq(staff.businessId, business.id), isNull(staff.deletedAt)))
     .orderBy(staff.createdAt).limit(1)
-  if (!defaultStaff) throw new Error("Sin personal configurado")
+  let defaultStaff = staffRows[0]
+  if (!defaultStaff) {
+    const [created] = await db.insert(staff).values({
+      businessId: business.id,
+      name: business.name,
+    }).returning()
+    defaultStaff = created!
+  }
 
   const startAt = new Date(`${data.date}T${data.time}:00`)
   const endAt = new Date(startAt.getTime() + service.durationMinutes * 60000)
