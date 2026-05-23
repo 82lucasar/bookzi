@@ -103,18 +103,18 @@ export default function NewAppointmentForm({
     setSelectedDay(null)
   }
 
+  const canGoToStep2 = !!clientName.trim() && !!clientPhone.trim()
+  const canGoToStep3 = !!serviceId && !!selectedDay && !!selectedSlot
+
   function goToStep2() {
+    if (!canGoToStep2) return
     setError(null)
-    if (!clientName.trim()) { setError("Ingresá el nombre del cliente."); return }
-    if (!clientPhone.trim()) { setError("Ingresá el número de WhatsApp."); return }
     setStep(2)
   }
 
   function goToStep3() {
+    if (!canGoToStep3) return
     setError(null)
-    if (!serviceId) { setError("Elegí un servicio."); return }
-    if (!selectedDay) { setError("Seleccioná un día en el calendario."); return }
-    if (!selectedSlot) { setError("Seleccioná un horario disponible."); return }
     setStep(3)
   }
 
@@ -450,7 +450,14 @@ export default function NewAppointmentForm({
           <div className="step-footer">
             {step === 1 && (
               <>
-                <button className="btn btn-primary btn-full btn-lg" onClick={goToStep2}>Siguiente — Fecha y hora</button>
+                <button
+                  className="btn btn-primary btn-full btn-lg"
+                  onClick={goToStep2}
+                  disabled={!canGoToStep2}
+                  style={{ opacity: canGoToStep2 ? 1 : 0.4, cursor: canGoToStep2 ? "pointer" : "not-allowed" }}
+                >
+                  Siguiente — Fecha y hora
+                </button>
                 <Link href="/dashboard" style={{ width: "100%" }}>
                   <button className="btn btn-secondary btn-full">Cancelar</button>
                 </Link>
@@ -458,7 +465,14 @@ export default function NewAppointmentForm({
             )}
             {step === 2 && (
               <>
-                <button className="btn btn-primary btn-full btn-lg" onClick={goToStep3}>Siguiente — Confirmar</button>
+                <button
+                  className="btn btn-primary btn-full btn-lg"
+                  onClick={goToStep3}
+                  disabled={!canGoToStep3}
+                  style={{ opacity: canGoToStep3 ? 1 : 0.4, cursor: canGoToStep3 ? "pointer" : "not-allowed" }}
+                >
+                  Siguiente — Confirmar
+                </button>
                 <button className="btn btn-secondary btn-full" onClick={() => setStep(1)}>Volver</button>
               </>
             )}
