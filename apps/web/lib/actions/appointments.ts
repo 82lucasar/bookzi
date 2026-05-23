@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { db } from "@bookzi/db"
-import { appointments, services, clients } from "@bookzi/db/schema"
+import { appointments, services, clients, staff } from "@bookzi/db/schema"
 import { eq, and, gte, lt, desc, ne, isNull } from "drizzle-orm"
 import { getMyBusiness } from "./business"
 
@@ -86,4 +86,59 @@ export async function cancelAppointment(appointmentId: string) {
 
   revalidatePath("/dashboard/appointments")
   revalidatePath("/dashboard")
+}
+
+export async function createDashboardAppointment(data: {
+  clientName: string
+  clientPhone: string
+  clientEmail: string
+  serviceId: string
+  date: string
+  time: string
+}): Promise<string> {
+  const business = await getMyBusiness()
+  if (!business) throw new Error("No se encontró el negocio")
+
+  const [service] = await db.select().from(services)
+    .where(eq(services.id, data.serviceId)).limit(1)
+  if (!service) throw new Error("Servicio no encontrado")
+
+  const [defaultStaff] = await db.select().from(staff)
+    .where(and(eq(staff.businessId, business.id), isNull(staff.deletedAt)))
+    .orderBy(staff.createdAt).limit(1)
+  if (!defaultStaff) throw new Error("Sin personal configurado")
+
+  const startAt = new Date(`${data.date}T${data.time}:00`)
+  const endAt = new Date(startAt.getTime() + service.durationMinutes * 60000)
+
+  let [client] = await db.select().from(clients)
+    .where(and(
+      eq(clients.businessId, business.id),
+      eq(clients.phone, data.clientPhone),
+    )).limit(1)
+
+  if (!client) {
+    const [inserted] = await db.insert(clients).values({
+      businessId: business.id,
+      name: data.clientName,
+      phone: data.clientPhone,
+      email: data.clientEmail || null,
+    }).returning()
+    client = inserted!
+  }
+
+  const [inserted] = await db.insert(appointments).values({
+    businessId: business.id,
+    serviceId: data.serviceId,
+    staffId: defaultStaff.id,
+    clientId: client.id,
+    startAt,
+    endAt,
+    status: "pending",
+    priceSnapshot: service.price,
+    currencySnapshot: service.currency,
+  }).returning()
+
+  revalidatePath("/dashboard")
+  return inserted!.id
 }
