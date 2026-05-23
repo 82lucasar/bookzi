@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic"
+import Link from "next/link"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
@@ -113,6 +114,7 @@ export default async function AppointmentsPage({
                   className="bg-white rounded-3xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
                   style={{ border: "1.5px solid var(--color-border)" }}
                 >
+                  <Link href={`/dashboard/appointments/${appt.id}`} style={{ display: "block", textDecoration: "none" }}>
                   <div className="flex items-stretch">
                     {/* Columna de fecha — brand manual */}
                     <div
@@ -178,6 +180,7 @@ export default async function AppointmentsPage({
                       </div>
                     </div>
                   </div>
+                  </Link>
 
                   {/* Acciones */}
                   {(appt.status === "pending" || appt.status === "confirmed") && (

@@ -192,16 +192,16 @@ export default function NewAppointmentForm({
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", marginTop: 8 }}>
               <button
-                className="btn btn-primary btn-full btn-lg"
-                onClick={() => router.push("/dashboard")}
+                className="btn btn-accent btn-full btn-lg"
+                onClick={() => router.push(`/dashboard/appointments/${appointmentId}`)}
               >
-                Volver al inicio
+                Ver y confirmar turno →
               </button>
               <button
                 className="btn btn-secondary btn-full"
-                onClick={() => { setStep(1); setClientName(""); setClientPhone(""); setClientEmail(""); setServiceId(""); setSelectedDay(null); setSelectedSlot(null) }}
+                onClick={() => router.push("/dashboard")}
               >
-                Crear otro turno
+                Volver al inicio
               </button>
             </div>
           </div>

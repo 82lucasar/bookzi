@@ -6,6 +6,36 @@ import { appointments, services, clients, staff } from "@bookzi/db/schema"
 import { eq, and, gte, lt, desc, ne, isNull } from "drizzle-orm"
 import { getMyBusiness } from "./business"
 
+export async function getAppointment(id: string) {
+  const business = await getMyBusiness()
+  if (!business) return null
+
+  const [appt] = await db
+    .select({
+      id: appointments.id,
+      startAt: appointments.startAt,
+      endAt: appointments.endAt,
+      status: appointments.status,
+      notes: appointments.notes,
+      priceSnapshot: appointments.priceSnapshot,
+      serviceName: services.name,
+      clientName: clients.name,
+      clientPhone: clients.phone,
+      clientEmail: clients.email,
+    })
+    .from(appointments)
+    .innerJoin(services, eq(appointments.serviceId, services.id))
+    .innerJoin(clients, eq(appointments.clientId, clients.id))
+    .where(and(
+      eq(appointments.id, id),
+      eq(appointments.businessId, business.id),
+      isNull(appointments.deletedAt),
+    ))
+    .limit(1)
+
+  return appt ?? null
+}
+
 export async function getAppointments(filter: "upcoming" | "today" | "past" = "upcoming") {
   const business = await getMyBusiness()
   if (!business) return []
