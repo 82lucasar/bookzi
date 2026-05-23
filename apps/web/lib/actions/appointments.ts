@@ -18,7 +18,9 @@ export async function getAppointment(id: string) {
       status: appointments.status,
       notes: appointments.notes,
       priceSnapshot: appointments.priceSnapshot,
+      serviceId: appointments.serviceId,
       serviceName: services.name,
+      durationMinutes: services.durationMinutes,
       clientName: clients.name,
       clientPhone: clients.phone,
       clientEmail: clients.email,
@@ -33,7 +35,61 @@ export async function getAppointment(id: string) {
     ))
     .limit(1)
 
-  return appt ?? null
+  return appt ? { ...appt, businessId: business.id } : null
+}
+
+export async function getAppointmentsForCalendar() {
+  const business = await getMyBusiness()
+  if (!business) return []
+
+  const from = new Date()
+  from.setDate(from.getDate() - 7)
+
+  return db
+    .select({
+      id: appointments.id,
+      startAt: appointments.startAt,
+      endAt: appointments.endAt,
+      status: appointments.status,
+      clientName: clients.name,
+      serviceName: services.name,
+    })
+    .from(appointments)
+    .innerJoin(services, eq(appointments.serviceId, services.id))
+    .innerJoin(clients, eq(appointments.clientId, clients.id))
+    .where(and(
+      eq(appointments.businessId, business.id),
+      ne(appointments.status, "cancelled"),
+      isNull(appointments.deletedAt),
+      gte(appointments.startAt, from),
+    ))
+    .orderBy(appointments.startAt)
+    .limit(500)
+}
+
+export async function rescheduleAppointment(
+  id: string,
+  newDate: string,
+  newTime: string,
+  durationMinutes: number,
+) {
+  const business = await getMyBusiness()
+  if (!business) throw new Error("No se encontró el negocio")
+
+  const startAt = new Date(`${newDate}T${newTime}:00`)
+  const endAt   = new Date(startAt.getTime() + durationMinutes * 60000)
+
+  await db
+    .update(appointments)
+    .set({ startAt, endAt, status: "confirmed", updatedAt: new Date() })
+    .where(and(
+      eq(appointments.id, id),
+      eq(appointments.businessId, business.id),
+    ))
+
+  revalidatePath("/dashboard/appointments")
+  revalidatePath("/dashboard/agenda")
+  revalidatePath("/dashboard")
 }
 
 export async function getAppointments(filter: "upcoming" | "today" | "past" = "upcoming") {
@@ -94,6 +150,7 @@ export async function confirmAppointment(appointmentId: string) {
     ))
 
   revalidatePath("/dashboard/appointments")
+  revalidatePath("/dashboard/agenda")
   revalidatePath("/dashboard")
 }
 
@@ -115,6 +172,7 @@ export async function cancelAppointment(appointmentId: string) {
     ))
 
   revalidatePath("/dashboard/appointments")
+  revalidatePath("/dashboard/agenda")
   revalidatePath("/dashboard")
 }
 
