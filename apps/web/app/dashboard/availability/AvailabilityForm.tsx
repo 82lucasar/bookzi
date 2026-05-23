@@ -13,9 +13,9 @@ const DAYS_LIST = [
   { key: "sunday",    label: "Domingo" },
 ]
 
-// 07:00 → 22:30 en pasos de 30 min
-const TIMES = Array.from({ length: 32 }, (_, i) => {
-  const total = 7 * 60 + i * 30
+// 00:00 → 24:00 en pasos de 30 min
+const TIMES = Array.from({ length: 49 }, (_, i) => {
+  const total = i * 30
   const h = String(Math.floor(total / 60)).padStart(2, "0")
   const m = String(total % 60).padStart(2, "0")
   return `${h}:${m}`
