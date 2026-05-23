@@ -5,13 +5,13 @@ import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
 import { getAppointments, confirmAppointment, cancelAppointment } from "@/lib/actions/appointments"
 
+const TZ = "America/Argentina/Buenos_Aires"
+
 const STATUS_CONFIG: Record<string, { label: string; icon: string; bg: string; text: string; border: string }> = {
   pending:   { label: "Pendiente",  icon: "⏳", bg: "rgba(245,158,11,0.08)",  text: "#B45309", border: "rgba(245,158,11,0.2)"  },
   confirmed: { label: "Confirmado", icon: "✓",  bg: "rgba(5,150,105,0.08)",   text: "#047857", border: "rgba(5,150,105,0.2)"   },
   completed: { label: "Completado", icon: "—",  bg: "rgba(100,116,139,0.08)", text: "#64748B", border: "rgba(100,116,139,0.15)" },
 }
-
-const TZ = "America/Argentina/Buenos_Aires"
 
 function formatTime(date: Date) {
   return new Date(date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: TZ })
@@ -37,51 +37,60 @@ export default async function AppointmentsPage({
   const apptList = await getAppointments(filter)
 
   const tabs: { label: string; value: Filter }[] = [
-    { label: "Próximos", value: "upcoming" },
-    { label: "Hoy",      value: "today" },
-    { label: "Anteriores", value: "past" },
+    { label: "Próximos",    value: "upcoming" },
+    { label: "Hoy",         value: "today"    },
+    { label: "Anteriores",  value: "past"     },
   ]
 
   const emptyMessages: Record<Filter, { icon: string; title: string; subtitle: string }> = {
-    upcoming: { icon: "📭", title: "No hay turnos próximos",   subtitle: "Cuando lleguen nuevas reservas, aparecerán acá." },
-    today:    { icon: "☀️", title: "No hay turnos para hoy",   subtitle: "Disfrutá el tiempo libre." },
-    past:     { icon: "🗂️", title: "Sin historial de turnos",  subtitle: "Los turnos completados aparecerán acá." },
+    upcoming: { icon: "📭", title: "No hay turnos próximos",  subtitle: "Cuando lleguen nuevas reservas, aparecerán acá." },
+    today:    { icon: "☀️",  title: "No hay turnos para hoy", subtitle: "Disfrutá el tiempo libre."                       },
+    past:     { icon: "🗂️",  title: "Sin historial de turnos", subtitle: "Los turnos completados aparecerán acá."         },
   }
 
   return (
-    <div className="min-h-screen">
+    <div style={{ background: "var(--bg)", minHeight: "100dvh", paddingBottom: "calc(var(--nav-h) + 16px)" }}>
 
-      {/* Page header */}
-      <div
-        className="bg-white px-6 lg:px-10 py-7"
-        style={{ borderBottom: "1.5px solid var(--border)" }}
-      >
-        <h1 className="text-2xl font-extrabold text-[var(--text-dark)]" style={{ letterSpacing: "-0.5px" }}>
-          Turnos
-        </h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1 font-medium">
-          Confirmá o cancelá las reservas de tus clientes
-        </p>
+      {/* Header */}
+      <div style={{
+        background: "white", borderBottom: "1.5px solid var(--border)",
+        padding: "0 16px", height: 56,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        position: "sticky", top: 0, zIndex: 40,
+      }}>
+        <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Turnos</span>
+        <Link href="/dashboard/appointments/new" style={{ textDecoration: "none" }}>
+          <button style={{
+            height: 34, padding: "0 14px", borderRadius: 10,
+            background: "var(--primary)", color: "white",
+            fontWeight: 700, fontSize: 13, border: "none",
+            cursor: "pointer", fontFamily: "var(--font)",
+          }}>
+            + Nuevo
+          </button>
+        </Link>
       </div>
 
-      <div className="px-6 lg:px-10 py-8 max-w-3xl">
+      <div style={{ padding: "16px 16px 0", maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", gap: 14 }}>
 
         {/* Tabs */}
-        <div
-          className="flex gap-1.5 bg-white rounded-2xl p-1.5 mb-7 w-fit shadow-sm"
-          style={{ border: "1.5px solid var(--border)" }}
-        >
+        <div style={{
+          display: "flex", gap: 4, background: "white",
+          borderRadius: 16, padding: 5,
+          border: "1.5px solid var(--border)",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+        }}>
           {tabs.map((tab) => (
             <a
               key={tab.value}
               href={`/dashboard/appointments?filter=${tab.value}`}
-              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all"
-              style={filter === tab.value ? {
-                background: "linear-gradient(135deg, #0284C7, #0369A1)",
-                color: "white",
-                boxShadow: "0 2px 8px rgba(2,132,199,0.3)",
-              } : {
-                color: "var(--text-muted)",
+              style={{
+                flex: 1, textAlign: "center", padding: "9px 0",
+                borderRadius: 12, fontSize: 13, fontWeight: 700,
+                textDecoration: "none",
+                background: filter === tab.value ? "linear-gradient(135deg, #0284C7, #0369A1)" : "transparent",
+                color: filter === tab.value ? "white" : "var(--text-muted)",
+                boxShadow: filter === tab.value ? "0 2px 8px rgba(2,132,199,0.3)" : "none",
               }}
             >
               {tab.label}
@@ -89,126 +98,134 @@ export default async function AppointmentsPage({
           ))}
         </div>
 
+        {/* Contenido */}
         {apptList.length === 0 ? (
-          <div
-            className="bg-white rounded-3xl py-20 text-center shadow-sm"
-            style={{ border: "1.5px solid var(--border)" }}
-          >
-            <p className="text-5xl mb-5">{emptyMessages[filter].icon}</p>
-            <p className="font-extrabold text-[var(--text-dark)] text-xl mb-2" style={{ letterSpacing: "-0.4px" }}>
+          <div style={{
+            background: "white", borderRadius: 24, padding: "56px 24px",
+            textAlign: "center", border: "1.5px solid var(--border)",
+            boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
+          }}>
+            <p style={{ fontSize: 40, marginBottom: 16 }}>{emptyMessages[filter].icon}</p>
+            <p style={{ fontWeight: 800, color: "var(--text-dark)", fontSize: 18, letterSpacing: "-0.4px", marginBottom: 8 }}>
               {emptyMessages[filter].title}
             </p>
-            <p className="text-sm text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
+            <p style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 240, margin: "0 auto", lineHeight: 1.6 }}>
               {emptyMessages[filter].subtitle}
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {apptList.map((appt) => {
               const sc = STATUS_CONFIG[appt.status] ?? STATUS_CONFIG.pending!
-              const d = new Date(appt.startAt)
-              const day = d.getDate()
-              const month = d.toLocaleDateString("es-AR", { month: "short" }).replace(".", "").toUpperCase()
+              const d  = new Date(appt.startAt)
+              const day   = Number(d.toLocaleDateString("en-CA", { day: "numeric", timeZone: TZ }))
+              const month = d.toLocaleDateString("es-AR", { month: "short", timeZone: TZ }).replace(".", "").toUpperCase()
 
               return (
                 <div
                   key={appt.id}
-                  className="bg-white rounded-3xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
-                  style={{ border: "1.5px solid var(--border)" }}
+                  style={{
+                    background: "white", borderRadius: 20,
+                    overflow: "hidden", border: "1.5px solid var(--border)",
+                    boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
+                  }}
                 >
+                  {/* Card principal — clickeable */}
                   <Link href={`/dashboard/appointments/${appt.id}`} style={{ display: "block", textDecoration: "none" }}>
-                  <div className="flex items-stretch">
-                    {/* Columna de fecha — brand manual */}
-                    <div
-                      className="flex flex-col items-center justify-center px-5 py-6 shrink-0"
-                      style={{ background: "linear-gradient(180deg, #0284C7, #0369A1)", minWidth: 72 }}
-                    >
-                      <span className="text-3xl font-extrabold text-white leading-none">{day}</span>
-                      <span className="text-[11px] font-bold text-white/75 uppercase tracking-wide mt-1">{month}</span>
-                    </div>
+                    <div style={{ display: "flex", alignItems: "stretch" }}>
 
-                    {/* Contenido */}
-                    <div className="flex-1 px-6 py-5 min-w-0">
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="min-w-0">
-                          <p className="font-extrabold text-[var(--text-dark)] text-base leading-tight truncate">
-                            {appt.clientName}
-                          </p>
-                          <p className="text-sm text-[var(--text-muted)] mt-0.5 truncate font-medium">
-                            {appt.serviceName}
-                          </p>
-                        </div>
-                        <span
-                          className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5"
-                          style={{ background: sc.bg, color: sc.text, border: `1.5px solid ${sc.border}` }}
-                        >
-                          <span>{sc.icon}</span>
-                          {sc.label}
-                        </span>
+                      {/* Columna fecha */}
+                      <div style={{
+                        background: "linear-gradient(180deg, #0284C7, #0369A1)",
+                        display: "flex", flexDirection: "column",
+                        alignItems: "center", justifyContent: "center",
+                        padding: "20px 14px", minWidth: 66, flexShrink: 0,
+                      }}>
+                        <span style={{ fontSize: 26, fontWeight: 900, color: "white", lineHeight: 1 }}>{day}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.75)", textTransform: "uppercase", marginTop: 4, letterSpacing: "0.05em" }}>{month}</span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-1.5">
-                          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="text-sm font-bold text-[var(--primary)]">
-                            {formatTime(appt.startAt)}
-                          </span>
-                          <span className="text-xs text-[var(--text-muted)]">—</span>
-                          <span className="text-sm font-medium text-[var(--text-muted)]">
-                            {formatTime(appt.endAt)}
+                      {/* Contenido */}
+                      <div style={{ flex: 1, padding: "14px 14px", minWidth: 0 }}>
+
+                        {/* Nombre + badge */}
+                        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <p style={{ fontWeight: 800, color: "var(--text-dark)", fontSize: 15, lineHeight: 1.25, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                              {appt.clientName}
+                            </p>
+                            <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", fontWeight: 500 }}>
+                              {appt.serviceName}
+                            </p>
+                          </div>
+                          <span style={{
+                            flexShrink: 0, fontSize: 11, fontWeight: 700,
+                            padding: "4px 9px", borderRadius: 20,
+                            background: sc.bg, color: sc.text, border: `1.5px solid ${sc.border}`,
+                            display: "flex", alignItems: "center", gap: 4,
+                            whiteSpace: "nowrap",
+                          }}>
+                            <span>{sc.icon}</span>
+                            {sc.label}
                           </span>
                         </div>
-                        {appt.clientPhone && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-[var(--border)]" />
-                            <div className="flex items-center gap-1.5">
-                              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--text-muted)" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                              </svg>
-                              <span className="text-xs text-[var(--text-muted)] font-medium">{appt.clientPhone}</span>
-                            </div>
-                          </>
-                        )}
-                        {appt.priceSnapshot && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-[var(--border)]" />
-                            <span className="text-sm font-extrabold text-[var(--accent)]">
-                              ${Number(appt.priceSnapshot).toLocaleString("es-AR")}
+
+                        {/* Meta */}
+                        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#0284C7" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--primary)" }}>
+                              {formatTime(appt.startAt)}
                             </span>
-                          </>
-                        )}
+                            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>—</span>
+                            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>
+                              {formatTime(appt.endAt)}
+                            </span>
+                          </div>
+                          {appt.priceSnapshot && (
+                            <>
+                              <span style={{ width: 3, height: 3, borderRadius: "50%", background: "var(--border)", flexShrink: 0 }} />
+                              <span style={{ fontSize: 13, fontWeight: 800, color: "var(--accent)" }}>
+                                ${Number(appt.priceSnapshot).toLocaleString("es-AR")}
+                              </span>
+                            </>
+                          )}
+                        </div>
+
                       </div>
                     </div>
-                  </div>
                   </Link>
 
-                  {/* Acciones */}
+                  {/* Acciones rápidas */}
                   {(appt.status === "pending" || appt.status === "confirmed") && (
-                    <div
-                      className="flex gap-3 px-6 py-4"
-                      style={{ borderTop: "1.5px solid var(--border)", background: "var(--bg)" }}
-                    >
+                    <div style={{ display: "flex", gap: 10, padding: "10px 14px", borderTop: "1.5px solid var(--border)", background: "var(--bg)" }}>
                       {appt.status === "pending" && (
-                        <form action={confirmAppointment.bind(null, appt.id)} className="flex-1">
+                        <form action={confirmAppointment.bind(null, appt.id)} style={{ flex: 1 }}>
                           <button
                             type="submit"
-                            className="w-full h-11 rounded-2xl font-bold text-white text-sm transition-all hover:shadow-md"
                             style={{
+                              width: "100%", height: 38, borderRadius: 10, border: "none",
                               background: "linear-gradient(135deg, #059669, #047857)",
-                              boxShadow: "0 2px 8px rgba(5,150,105,0.3)",
+                              color: "white", fontWeight: 700, fontSize: 13,
+                              fontFamily: "var(--font)", cursor: "pointer",
+                              boxShadow: "0 2px 8px rgba(5,150,105,0.25)",
                             }}
                           >
-                            ✓ Confirmar turno
+                            ✓ Confirmar
                           </button>
                         </form>
                       )}
-                      <form action={cancelAppointment.bind(null, appt.id)} className="flex-1">
+                      <form action={cancelAppointment.bind(null, appt.id)} style={{ flex: 1 }}>
                         <button
                           type="submit"
-                          className="w-full h-11 rounded-2xl text-sm font-bold transition-all hover:bg-red-50 hover:text-[var(--error)] hover:border-red-200"
-                          style={{ border: "1.5px solid var(--border)", color: "var(--text-muted)", background: "white" }}
+                          style={{
+                            width: "100%", height: 38, borderRadius: 10,
+                            border: "1.5px solid var(--border)", background: "white",
+                            color: "var(--text-muted)", fontWeight: 700, fontSize: 13,
+                            fontFamily: "var(--font)", cursor: "pointer",
+                          }}
                         >
                           Cancelar
                         </button>
@@ -221,6 +238,27 @@ export default async function AppointmentsPage({
           </div>
         )}
       </div>
+
+      {/* Bottom Nav */}
+      <nav className="bottom-nav">
+        <Link href="/dashboard" className="nav-item">
+          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="1" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/></svg>
+          Inicio
+        </Link>
+        <Link href="/dashboard/agenda" className="nav-item">
+          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="3" width="20" height="17" rx="3" stroke="currentColor" strokeWidth="1.6"/><path d="M6 1v4M16 1v4M1 10h20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+          Agenda
+        </Link>
+        <Link href="/dashboard/appointments" className="nav-item active">
+          <svg viewBox="0 0 22 22" fill="none"><path d="M2 5h18M2 11h12M2 17h8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
+          Turnos
+        </Link>
+        <Link href="/dashboard/profile" className="nav-item">
+          <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/><path d="M2 20c0-3.5 4-6 9-6s9 2.5 9 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+          Perfil
+        </Link>
+      </nav>
+
     </div>
   )
 }
