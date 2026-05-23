@@ -2,37 +2,30 @@
 
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
 
-export default function LoginPage() {
-  const router   = useRouter()
-  const [step, setStep]         = useState<"welcome" | "form">("welcome")
-  const [email, setEmail]       = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError]       = useState<string | null>(null)
-  const [loading, setLoading]   = useState(false)
+export default function ForgotPasswordPage() {
+  const [email, setEmail]     = useState("")
+  const [error, setError]     = useState<string | null>(null)
+  const [sent, setSent]       = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
     try {
       const supabase = createClient()
-      const { error } = await Promise.race([
-        supabase.auth.signInWithPassword({ email, password }),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("La conexión tardó demasiado. Revisá tu conexión e intentá de nuevo.")), 15000)
-        ),
-      ])
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      })
       if (error) {
-        setError("Email o contraseña incorrectos. Revisá tus datos.")
+        setError("No pudimos enviar el email. Revisá la dirección e intentá de nuevo.")
         setLoading(false)
         return
       }
-      router.push("/dashboard")
-      router.refresh()
-    } catch (err: any) {
-      setError(err.message || "Ocurrió un error. Intentá de nuevo.")
+      setSent(true)
+    } catch {
+      setError("Ocurrió un error. Intentá de nuevo.")
       setLoading(false)
     }
   }
@@ -71,7 +64,6 @@ export default function LoginPage() {
         pointerEvents: "none",
       }} />
 
-      {/* Contenido central */}
       <div style={{
         position: "relative",
         zIndex: 1,
@@ -101,68 +93,68 @@ export default function LoginPage() {
           Bookzi
         </p>
 
-        {step === "welcome" ? (
-
-          /* ── Pantalla de bienvenida ── */
+        {sent ? (
+          /* ── Confirmación de envío ── */
           <>
-            <h1 style={{
-              fontSize: 42, fontWeight: 900, color: "white",
-              marginBottom: 16, letterSpacing: "-1.5px", lineHeight: 1.08,
+            <div style={{
+              width: 64, height: 64, borderRadius: "50%",
+              background: "rgba(255,255,255,0.20)",
+              border: "1.5px solid rgba(255,255,255,0.30)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              marginBottom: 24,
             }}>
-              Hola, bienvenido/a
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path d="M5 14l6 6L23 8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+
+            <h1 style={{
+              fontSize: 30, fontWeight: 900, color: "white",
+              marginBottom: 14, letterSpacing: "-1px", lineHeight: 1.1,
+            }}>
+              Revisá tu email
             </h1>
 
             <p style={{
-              color: "rgba(255,255,255,0.75)", fontSize: 16,
-              lineHeight: 1.6, marginBottom: 52, maxWidth: 280,
+              color: "rgba(255,255,255,0.75)", fontSize: 15,
+              lineHeight: 1.6, marginBottom: 40, maxWidth: 280,
             }}>
-              Configuremos tu agenda en 3 pasos rápidos y empezás a recibir turnos hoy mismo.
+              Te mandamos un link a <strong style={{ color: "white" }}>{email}</strong> para que puedas crear una nueva contraseña.
             </p>
-
-            <button
-              onClick={() => setStep("form")}
-              style={{
-                width: "100%", height: 58, borderRadius: 16,
-                background: "white", color: "#0284C7",
-                fontWeight: 800, fontSize: 17,
-                border: "none", cursor: "pointer",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-              }}
-            >
-              Empezar
-            </button>
 
             <p style={{
               color: "rgba(255,255,255,0.45)", fontSize: 13,
-              marginTop: 20,
+              marginBottom: 32,
             }}>
-              Tomá 3 minutos ahora, ganás horas cada semana
+              Si no lo ves, revisá la carpeta de spam
             </p>
+
+            <a href="/login" style={{
+              color: "rgba(255,255,255,0.70)", fontSize: 14, fontWeight: 600,
+              textDecoration: "underline",
+            }}>
+              ← Volver al inicio de sesión
+            </a>
           </>
-
         ) : (
-
-          /* ── Formulario de login ── */
+          /* ── Formulario ── */
           <>
             <h1 style={{
               fontSize: 32, fontWeight: 900, color: "white",
-              marginBottom: 10, letterSpacing: "-1px", lineHeight: 1.1,
+              marginBottom: 12, letterSpacing: "-1px", lineHeight: 1.1,
             }}>
-              Ingresá a tu cuenta
+              Olvidé mi contraseña
             </h1>
 
             <p style={{
-              color: "rgba(255,255,255,0.65)", fontSize: 15,
-              marginBottom: 36,
+              color: "rgba(255,255,255,0.70)", fontSize: 15,
+              lineHeight: 1.6, marginBottom: 36, maxWidth: 280,
             }}>
-              ¿No tenés cuenta?{" "}
-              <a href="/register" style={{ color: "white", fontWeight: 700, textDecoration: "underline" }}>
-                Registrate gratis
-              </a>
+              Ingresá tu email y te mandamos un link para crear una nueva contraseña.
             </p>
 
             <form
-              onSubmit={handleLogin}
+              onSubmit={handleSubmit}
               style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}
             >
               <input
@@ -170,7 +162,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                placeholder="Tu email"
                 autoComplete="email"
                 style={{
                   width: "100%", height: 54, borderRadius: 14,
@@ -182,33 +174,6 @@ export default function LoginPage() {
                   fontFamily: "inherit",
                 }}
               />
-
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Contraseña"
-                autoComplete="current-password"
-                style={{
-                  width: "100%", height: 54, borderRadius: 14,
-                  border: "1.5px solid rgba(255,255,255,0.28)",
-                  background: "rgba(255,255,255,0.16)",
-                  color: "white", fontSize: 15,
-                  padding: "0 16px", outline: "none",
-                  boxSizing: "border-box",
-                  fontFamily: "inherit",
-                }}
-              />
-
-              <div style={{ textAlign: "right", marginTop: -4 }}>
-                <a href="/forgot-password" style={{
-                  color: "rgba(255,255,255,0.65)", fontSize: 13, fontWeight: 500,
-                  textDecoration: "none",
-                }}>
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
 
               {error && (
                 <p style={{
@@ -233,23 +198,17 @@ export default function LoginPage() {
                   fontFamily: "inherit",
                 }}
               >
-                {loading ? "Ingresando..." : "Ingresar →"}
+                {loading ? "Enviando..." : "Enviar link →"}
               </button>
             </form>
 
-            <button
-              onClick={() => setStep("welcome")}
-              style={{
-                background: "none", border: "none",
-                color: "rgba(255,255,255,0.5)", fontSize: 13,
-                marginTop: 24, cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              ← Volver
-            </button>
+            <a href="/login" style={{
+              color: "rgba(255,255,255,0.50)", fontSize: 13,
+              marginTop: 28, textDecoration: "none", cursor: "pointer",
+            }}>
+              ← Volver al inicio de sesión
+            </a>
           </>
-
         )}
       </div>
     </div>

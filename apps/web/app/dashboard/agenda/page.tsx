@@ -222,7 +222,7 @@ export default function AgendaPage() {
           <svg viewBox="0 0 22 22" fill="none"><path d="M2 5h18M2 11h12M2 17h8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
           Turnos
         </Link>
-        <Link href="#" className="nav-item">
+        <Link href="/dashboard/profile" className="nav-item">
           <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/><path d="M2 20c0-3.5 4-6 9-6s9 2.5 9 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
           Perfil
         </Link>

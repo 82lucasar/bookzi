@@ -46,6 +46,29 @@ export async function createService(formData: FormData) {
   redirect("/dashboard/services")
 }
 
+export async function saveOnboardingServices(
+  servicesData: Array<{ name: string; durationMinutes: number; price: string }>
+) {
+  const business = await getMyBusiness()
+  if (!business) redirect("/dashboard/setup")
+
+  const inserts = servicesData
+    .filter(s => s.name.trim().length > 0)
+    .map(s => ({
+      businessId: business.id,
+      name: s.name.trim(),
+      durationMinutes: s.durationMinutes,
+      price: s.price?.trim() || null,
+      currency: "ARS" as const,
+    }))
+
+  if (inserts.length > 0) {
+    await db.insert(services).values(inserts)
+  }
+
+  redirect("/onboarding/done")
+}
+
 export async function deleteService(serviceId: string) {
   const business = await getMyBusiness()
   if (!business) return

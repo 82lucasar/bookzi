@@ -3,15 +3,16 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { saveAvailability } from "@/lib/actions/availability"
 
 const DAYS = [
-  { key: "lunes",    label: "L", name: "Lun", fullName: "Lunes" },
-  { key: "martes",   label: "M", name: "Mar", fullName: "Martes" },
-  { key: "miercoles",label: "X", name: "Mié", fullName: "Miércoles" },
-  { key: "jueves",   label: "J", name: "Jue", fullName: "Jueves" },
-  { key: "viernes",  label: "V", name: "Vie", fullName: "Viernes" },
-  { key: "sabado",   label: "S", name: "Sáb", fullName: "Sábado" },
-  { key: "domingo",  label: "D", name: "Dom", fullName: "Domingo" },
+  { key: "lunes",     label: "L", name: "Lun", fullName: "Lunes",     eng: "monday" },
+  { key: "martes",    label: "M", name: "Mar", fullName: "Martes",    eng: "tuesday" },
+  { key: "miercoles", label: "X", name: "Mié", fullName: "Miércoles", eng: "wednesday" },
+  { key: "jueves",    label: "J", name: "Jue", fullName: "Jueves",    eng: "thursday" },
+  { key: "viernes",   label: "V", name: "Vie", fullName: "Viernes",   eng: "friday" },
+  { key: "sabado",    label: "S", name: "Sáb", fullName: "Sábado",    eng: "saturday" },
+  { key: "domingo",   label: "D", name: "Dom", fullName: "Domingo",   eng: "sunday" },
 ]
 
 export default function AvailabilityPage() {
@@ -22,6 +23,19 @@ export default function AvailabilityPage() {
   const [hours, setHours] = useState<Record<string, { from: string; to: string }>>(
     Object.fromEntries(DAYS.map(d => [d.key, { from: "09:00", to: "18:00" }]))
   )
+  const [loading, setLoading] = useState(false)
+
+  async function handleSave() {
+    setLoading(true)
+    const formData = new FormData()
+    DAYS.forEach(d => {
+      if (active.has(d.key)) formData.set(`${d.eng}_active`, "on")
+      formData.set(`${d.eng}_start`, hours[d.key]?.from ?? "09:00")
+      formData.set(`${d.eng}_end`, hours[d.key]?.to ?? "18:00")
+    })
+    await saveAvailability(formData)
+    router.push("/onboarding/services")
+  }
 
   const toggleDay = (key: string) => {
     setActive(prev => {
@@ -102,10 +116,19 @@ export default function AvailabilityPage() {
       </div>
 
       <div className="ob-footer" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <button className="btn btn-primary btn-full btn-lg" onClick={() => router.push("/onboarding/services")}>
-          Siguiente
+        <button
+          className="btn btn-primary btn-full btn-lg"
+          onClick={handleSave}
+          disabled={loading}
+          style={{ opacity: loading ? 0.8 : 1, cursor: loading ? "not-allowed" : "pointer" }}
+        >
+          {loading ? "Guardando..." : "Siguiente"}
         </button>
-        <button className="btn btn-secondary btn-full" onClick={() => router.push("/onboarding/services")}>
+        <button
+          className="btn btn-secondary btn-full"
+          onClick={() => router.push("/onboarding/services")}
+          disabled={loading}
+        >
           Configurar más tarde
         </button>
       </div>

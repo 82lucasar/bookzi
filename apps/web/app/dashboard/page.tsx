@@ -2,7 +2,16 @@ export const dynamic = "force-dynamic"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
+import { getAppointments } from "@/lib/actions/appointments"
 import Link from "next/link"
+
+function formatTime(date: Date) {
+  return date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })
+}
+
+function formatDay(date: Date) {
+  return date.toLocaleDateString("es-AR", { day: "numeric", month: "short" }).replace(".", "")
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -11,6 +20,16 @@ export default async function DashboardPage() {
 
   const business = await getMyBusiness()
   if (!business) redirect("/onboarding/welcome")
+
+  const [todayAppts, upcomingAppts] = await Promise.all([
+    getAppointments("today"),
+    getAppointments("upcoming"),
+  ])
+
+  const todayCount = todayAppts.length
+  const pendingCount = upcomingAppts.filter(a => a.status === "pending").length
+  const pendingAppts = upcomingAppts.filter(a => a.status === "pending").slice(0, 3)
+  const nextAppt = todayAppts.find(a => a.status === "confirmed")
 
   return (
     <div className="page-wrap">
@@ -34,7 +53,7 @@ export default async function DashboardPage() {
             <svg viewBox="0 0 18 18" fill="none"><path d="M2 4h14M2 9h9M2 14h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             Turnos
           </Link>
-          <Link href="#" className="sidebar-link">
+          <Link href="/dashboard/profile" className="sidebar-link">
             <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="4" stroke="currentColor" strokeWidth="1.5"/><path d="M1.5 16c0-3 3.4-5.5 7.5-5.5s7.5 2.5 7.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             Perfil
           </Link>
@@ -63,8 +82,14 @@ export default async function DashboardPage() {
           {/* Hero */}
           <div className="hero-strip" style={{ margin: "16px 16px 0" }}>
             <div className="hero-greeting">Buenos días, {business.name.split(" ")[0]}</div>
-            <div className="hero-count">Hoy tenés 6 turnos</div>
-            <div className="hero-next">Próximo: Valentina Ruiz a las 09:30</div>
+            <div className="hero-count">
+              {todayCount === 0 ? "Sin turnos hoy" : `Hoy tenés ${todayCount} turno${todayCount !== 1 ? "s" : ""}`}
+            </div>
+            {nextAppt && (
+              <div className="hero-next">
+                Próximo: {nextAppt.clientName} a las {formatTime(new Date(nextAppt.startAt))}
+              </div>
+            )}
             <Link href="/dashboard/agenda" className="hero-cta">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="2" stroke="white" strokeWidth="1.4"/><path d="M4 1v2M10 1v2M1 6h12" stroke="white" strokeWidth="1.4" strokeLinecap="round"/></svg>
               Ver todos
@@ -74,16 +99,16 @@ export default async function DashboardPage() {
           {/* Stats */}
           <div className="stats-row">
             <div className="stat-card">
-              <span className="stat-num green">6</span>
+              <span className={`stat-num${todayCount > 0 ? " green" : ""}`}>{todayCount}</span>
               <span className="stat-label">Hoy</span>
             </div>
             <div className="stat-card">
-              <span className="stat-num yellow">3</span>
+              <span className={`stat-num${pendingCount > 0 ? " yellow" : ""}`}>{pendingCount}</span>
               <span className="stat-label">Pendientes</span>
             </div>
             <div className="stat-card">
-              <span className="stat-num">28</span>
-              <span className="stat-label">Esta semana</span>
+              <span className="stat-num">{upcomingAppts.length}</span>
+              <span className="stat-label">Próximos</span>
             </div>
           </div>
 
@@ -91,113 +116,92 @@ export default async function DashboardPage() {
           <div className="section">
             <div className="section-hd">
               <h2>Pendientes de confirmación</h2>
-              <span>3</span>
+              {pendingCount > 0 && <span>{pendingCount}</span>}
             </div>
-            <div className="cards-stack">
-              {[
-                { day: "10", mon: "Jun", name: "Carlos Méndez", meta: "11:00 · Consulta general · 30 min" },
-                { day: "11", mon: "Jun", name: "Luciana Ferreira", meta: "14:00 · Seguimiento · 45 min" },
-                { day: "13", mon: "Jun", name: "Roberto Giménez", meta: "10:30 · Consulta general · 30 min" },
-              ].map((a, i) => (
-                <Link key={i} href="/dashboard/appointments/1" style={{ textDecoration: "none" }}>
-                  <div className="appt-card">
-                    <div className="appt-date-box">
-                      <span className="day">{a.day}</span>
-                      <span className="mon">{a.mon}</span>
-                    </div>
-                    <div className="appt-info">
-                      <div className="appt-name">{a.name}</div>
-                      <div className="appt-meta">{a.meta}</div>
-                    </div>
-                    <div className="appt-status">
-                      <span className="badge badge-pending">Pendiente</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            {pendingAppts.length === 0 ? (
+              <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>
+                No hay turnos pendientes de confirmación
+              </div>
+            ) : (
+              <div className="cards-stack">
+                {pendingAppts.map((a) => {
+                  const d = new Date(a.startAt)
+                  const parts = formatDay(d).split(" ")
+                  return (
+                    <Link key={a.id} href={`/dashboard/appointments/${a.id}`} style={{ textDecoration: "none" }}>
+                      <div className="appt-card">
+                        <div className="appt-date-box">
+                          <span className="day">{parts[0]}</span>
+                          <span className="mon">{parts[1]}</span>
+                        </div>
+                        <div className="appt-info">
+                          <div className="appt-name">{a.clientName}</div>
+                          <div className="appt-meta">{formatTime(d)} · {a.serviceName}</div>
+                        </div>
+                        <div className="appt-status">
+                          <span className="badge badge-pending">Pendiente</span>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
-          {/* Agenda de hoy / Timeline */}
+          {/* Agenda de hoy */}
           <div className="section" style={{ paddingBottom: 32 }}>
             <div className="section-hd">
               <h2>Agenda de hoy</h2>
               <Link href="/dashboard/agenda">Ver agenda</Link>
             </div>
-            <div className="today-label">
-              <span className="dot"></span>
-              Martes 10 de junio
-            </div>
 
-            <div style={{ display: "flex", flexDirection: "column" }}>
-
-              <div className="tl-row">
-                <div className="tl-time">08:00</div>
-                <div className="tl-spine"><div className="tl-dot empty"></div><div className="tl-line"></div></div>
-                <div className="tl-content"><div className="tl-empty-slot">Disponible</div></div>
-              </div>
-
-              {[
-                { time: "09:30", name: "Valentina Ruiz", meta: "09:30 · Consulta · 30 min", badge: "badge-confirmed", badgeText: "Confirmado" },
-                { time: "10:30", name: "Diego Álvarez", meta: "10:30 · Seguimiento · 45 min", badge: "badge-confirmed", badgeText: "Confirmado" },
-              ].map((a, i) => (
-                <div key={i} className="tl-row">
-                  <div className="tl-time">{a.time}</div>
-                  <div className="tl-spine"><div className="tl-dot"></div><div className="tl-line"></div></div>
-                  <div className="tl-content">
-                    <Link href="/dashboard/appointments/1" style={{ textDecoration: "none" }}>
-                      <div className="appt-card">
-                        <div className="appt-date-box">
-                          <span className="day">10</span>
-                          <span className="mon">Jun</span>
-                        </div>
-                        <div className="appt-info">
-                          <div className="appt-name">{a.name}</div>
-                          <div className="appt-meta">{a.meta}</div>
-                        </div>
-                        <div className="appt-status">
-                          <span className={`badge ${a.badge}`}>{a.badgeText}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
+            {todayAppts.length === 0 ? (
+              <div style={{ padding: "32px 16px", textAlign: "center" }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 16 }}>
+                  No tenés turnos para hoy
                 </div>
-              ))}
-
-              <div className="tl-row">
-                <div className="tl-time">12:00</div>
-                <div className="tl-spine"><div className="tl-dot empty"></div><div className="tl-line"></div></div>
-                <div className="tl-content"><div className="tl-empty-slot">Disponible</div></div>
+                <Link href="/dashboard/appointments/new">
+                  <button className="btn btn-primary btn-sm">+ Agregar turno</button>
+                </Link>
               </div>
-
-              {[
-                { time: "14:00", name: "Ana Martínez", meta: "14:00 · Control · 30 min", badge: "badge-rescheduled", badgeText: "Reprogramado" },
-                { time: "15:30", name: "Javier Torres", meta: "15:30 · Consulta · 30 min", badge: "badge-confirmed", badgeText: "Confirmado" },
-              ].map((a, i) => (
-                <div key={i} className="tl-row">
-                  <div className="tl-time">{a.time}</div>
-                  <div className="tl-spine"><div className="tl-dot"></div><div className="tl-line"></div></div>
-                  <div className="tl-content">
-                    <Link href="/dashboard/appointments/1" style={{ textDecoration: "none" }}>
-                      <div className="appt-card">
-                        <div className="appt-date-box">
-                          <span className="day">10</span>
-                          <span className="mon">Jun</span>
-                        </div>
-                        <div className="appt-info">
-                          <div className="appt-name">{a.name}</div>
-                          <div className="appt-meta">{a.meta}</div>
-                        </div>
-                        <div className="appt-status">
-                          <span className={`badge ${a.badge}`}>{a.badgeText}</span>
-                        </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {todayAppts.map((a) => {
+                  const d = new Date(a.startAt)
+                  const parts = formatDay(d).split(" ")
+                  const badgeClass = a.status === "confirmed" ? "badge-confirmed"
+                    : a.status === "rescheduled" ? "badge-rescheduled"
+                    : "badge-pending"
+                  const badgeText = a.status === "confirmed" ? "Confirmado"
+                    : a.status === "rescheduled" ? "Reprogramado"
+                    : "Pendiente"
+                  return (
+                    <div key={a.id} className="tl-row">
+                      <div className="tl-time">{formatTime(d)}</div>
+                      <div className="tl-spine"><div className="tl-dot"></div><div className="tl-line"></div></div>
+                      <div className="tl-content">
+                        <Link href={`/dashboard/appointments/${a.id}`} style={{ textDecoration: "none" }}>
+                          <div className="appt-card">
+                            <div className="appt-date-box">
+                              <span className="day">{parts[0]}</span>
+                              <span className="mon">{parts[1]}</span>
+                            </div>
+                            <div className="appt-info">
+                              <div className="appt-name">{a.clientName}</div>
+                              <div className="appt-meta">{formatTime(d)} · {a.serviceName}</div>
+                            </div>
+                            <div className="appt-status">
+                              <span className={`badge ${badgeClass}`}>{badgeText}</span>
+                            </div>
+                          </div>
+                        </Link>
                       </div>
-                    </Link>
-                  </div>
-                </div>
-              ))}
-
-            </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
         </div>
@@ -224,7 +228,7 @@ export default async function DashboardPage() {
           <svg viewBox="0 0 22 22" fill="none"><path d="M2 5h18M2 11h12M2 17h8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
           Turnos
         </Link>
-        <Link href="#" className="nav-item">
+        <Link href="/dashboard/profile" className="nav-item">
           <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/><path d="M2 20c0-3.5 4-6 9-6s9 2.5 9 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
           Perfil
         </Link>

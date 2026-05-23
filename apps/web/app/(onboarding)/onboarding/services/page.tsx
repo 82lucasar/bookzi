@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { saveOnboardingServices } from "@/lib/actions/services"
 
 interface Service { id: number; name: string; duration: string; price: string }
 
@@ -14,6 +15,7 @@ export default function ServicesPage() {
     { id: 1, name: "Consulta general", duration: "30", price: "" }
   ])
   const [nextId, setNextId] = useState(2)
+  const [loading, setLoading] = useState(false)
 
   const addService = () => {
     setServices(prev => [...prev, { id: nextId, name: "", duration: "30", price: "" }])
@@ -116,9 +118,20 @@ export default function ServicesPage() {
         <button
           className="btn btn-primary btn-full btn-lg"
           type="button"
-          onClick={() => router.push("/onboarding/done")}
+          disabled={loading}
+          style={{ opacity: loading ? 0.8 : 1, cursor: loading ? "not-allowed" : "pointer" }}
+          onClick={async () => {
+            setLoading(true)
+            await saveOnboardingServices(
+              services.map(s => ({
+                name: s.name,
+                durationMinutes: parseInt(s.duration),
+                price: s.price,
+              }))
+            )
+          }}
         >
-          ¡Listo! Ver mi agenda
+          {loading ? "Guardando..." : "¡Listo! Ver mi agenda"}
         </button>
       </div>
     </div>
