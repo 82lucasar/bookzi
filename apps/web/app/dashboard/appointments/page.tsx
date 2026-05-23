@@ -52,12 +52,12 @@ export default async function AppointmentsPage({
       {/* Page header */}
       <div
         className="bg-white px-6 lg:px-10 py-7"
-        style={{ borderBottom: "1.5px solid var(--color-border)" }}
+        style={{ borderBottom: "1.5px solid var(--border)" }}
       >
-        <h1 className="text-2xl font-extrabold text-[var(--color-text-dark)]" style={{ letterSpacing: "-0.5px" }}>
+        <h1 className="text-2xl font-extrabold text-[var(--text-dark)]" style={{ letterSpacing: "-0.5px" }}>
           Turnos
         </h1>
-        <p className="text-sm text-[var(--color-text-muted)] mt-1 font-medium">
+        <p className="text-sm text-[var(--text-muted)] mt-1 font-medium">
           Confirmá o cancelá las reservas de tus clientes
         </p>
       </div>
@@ -67,7 +67,7 @@ export default async function AppointmentsPage({
         {/* Tabs */}
         <div
           className="flex gap-1.5 bg-white rounded-2xl p-1.5 mb-7 w-fit shadow-sm"
-          style={{ border: "1.5px solid var(--color-border)" }}
+          style={{ border: "1.5px solid var(--border)" }}
         >
           {tabs.map((tab) => (
             <a
@@ -79,7 +79,7 @@ export default async function AppointmentsPage({
                 color: "white",
                 boxShadow: "0 2px 8px rgba(2,132,199,0.3)",
               } : {
-                color: "var(--color-text-muted)",
+                color: "var(--text-muted)",
               }}
             >
               {tab.label}
@@ -90,13 +90,13 @@ export default async function AppointmentsPage({
         {apptList.length === 0 ? (
           <div
             className="bg-white rounded-3xl py-20 text-center shadow-sm"
-            style={{ border: "1.5px solid var(--color-border)" }}
+            style={{ border: "1.5px solid var(--border)" }}
           >
             <p className="text-5xl mb-5">{emptyMessages[filter].icon}</p>
-            <p className="font-extrabold text-[var(--color-text-dark)] text-xl mb-2" style={{ letterSpacing: "-0.4px" }}>
+            <p className="font-extrabold text-[var(--text-dark)] text-xl mb-2" style={{ letterSpacing: "-0.4px" }}>
               {emptyMessages[filter].title}
             </p>
-            <p className="text-sm text-[var(--color-text-muted)] max-w-xs mx-auto leading-relaxed">
+            <p className="text-sm text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
               {emptyMessages[filter].subtitle}
             </p>
           </div>
@@ -112,7 +112,7 @@ export default async function AppointmentsPage({
                 <div
                   key={appt.id}
                   className="bg-white rounded-3xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
-                  style={{ border: "1.5px solid var(--color-border)" }}
+                  style={{ border: "1.5px solid var(--border)" }}
                 >
                   <Link href={`/dashboard/appointments/${appt.id}`} style={{ display: "block", textDecoration: "none" }}>
                   <div className="flex items-stretch">
@@ -129,10 +129,10 @@ export default async function AppointmentsPage({
                     <div className="flex-1 px-6 py-5 min-w-0">
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="min-w-0">
-                          <p className="font-extrabold text-[var(--color-text-dark)] text-base leading-tight truncate">
+                          <p className="font-extrabold text-[var(--text-dark)] text-base leading-tight truncate">
                             {appt.clientName}
                           </p>
-                          <p className="text-sm text-[var(--color-text-muted)] mt-0.5 truncate font-medium">
+                          <p className="text-sm text-[var(--text-muted)] mt-0.5 truncate font-medium">
                             {appt.serviceName}
                           </p>
                         </div>
@@ -147,32 +147,32 @@ export default async function AppointmentsPage({
 
                       <div className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center gap-1.5">
-                          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--color-primary)" strokeWidth="2">
+                          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" strokeWidth="2">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="text-sm font-bold text-[var(--color-primary)]">
+                          <span className="text-sm font-bold text-[var(--primary)]">
                             {formatTime(appt.startAt)}
                           </span>
-                          <span className="text-xs text-[var(--color-text-muted)]">—</span>
-                          <span className="text-sm font-medium text-[var(--color-text-muted)]">
+                          <span className="text-xs text-[var(--text-muted)]">—</span>
+                          <span className="text-sm font-medium text-[var(--text-muted)]">
                             {formatTime(appt.endAt)}
                           </span>
                         </div>
                         {appt.clientPhone && (
                           <>
-                            <span className="w-1 h-1 rounded-full bg-[var(--color-border)]" />
+                            <span className="w-1 h-1 rounded-full bg-[var(--border)]" />
                             <div className="flex items-center gap-1.5">
-                              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--color-text-muted)" strokeWidth="2">
+                              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--text-muted)" strokeWidth="2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                               </svg>
-                              <span className="text-xs text-[var(--color-text-muted)] font-medium">{appt.clientPhone}</span>
+                              <span className="text-xs text-[var(--text-muted)] font-medium">{appt.clientPhone}</span>
                             </div>
                           </>
                         )}
                         {appt.priceSnapshot && (
                           <>
-                            <span className="w-1 h-1 rounded-full bg-[var(--color-border)]" />
-                            <span className="text-sm font-extrabold text-[var(--color-accent)]">
+                            <span className="w-1 h-1 rounded-full bg-[var(--border)]" />
+                            <span className="text-sm font-extrabold text-[var(--accent)]">
                               ${Number(appt.priceSnapshot).toLocaleString("es-AR")}
                             </span>
                           </>
@@ -186,7 +186,7 @@ export default async function AppointmentsPage({
                   {(appt.status === "pending" || appt.status === "confirmed") && (
                     <div
                       className="flex gap-3 px-6 py-4"
-                      style={{ borderTop: "1.5px solid var(--color-border)", background: "var(--color-bg)" }}
+                      style={{ borderTop: "1.5px solid var(--border)", background: "var(--bg)" }}
                     >
                       {appt.status === "pending" && (
                         <form action={confirmAppointment.bind(null, appt.id)} className="flex-1">
@@ -205,8 +205,8 @@ export default async function AppointmentsPage({
                       <form action={cancelAppointment.bind(null, appt.id)} className="flex-1">
                         <button
                           type="submit"
-                          className="w-full h-11 rounded-2xl text-sm font-bold transition-all hover:bg-red-50 hover:text-[var(--color-error)] hover:border-red-200"
-                          style={{ border: "1.5px solid var(--color-border)", color: "var(--color-text-muted)", background: "white" }}
+                          className="w-full h-11 rounded-2xl text-sm font-bold transition-all hover:bg-red-50 hover:text-[var(--error)] hover:border-red-200"
+                          style={{ border: "1.5px solid var(--border)", color: "var(--text-muted)", background: "white" }}
                         >
                           Cancelar
                         </button>
