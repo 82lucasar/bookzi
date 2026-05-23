@@ -147,7 +147,7 @@ export async function bookAppointment(formData: FormData) {
 
   if (!defaultStaff) throw new Error("Sin personal disponible")
 
-  const startAt = new Date(`${dateStr}T${timeStr}:00`)
+  const startAt = new Date(`${dateStr}T${timeStr}:00-03:00`)
   const endAt = new Date(startAt.getTime() + service.durationMinutes * 60000)
 
   // Buscar o crear cliente por teléfono

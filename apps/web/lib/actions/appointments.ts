@@ -76,7 +76,7 @@ export async function rescheduleAppointment(
   const business = await getMyBusiness()
   if (!business) throw new Error("No se encontró el negocio")
 
-  const startAt = new Date(`${newDate}T${newTime}:00`)
+  const startAt = new Date(`${newDate}T${newTime}:00-03:00`)
   const endAt   = new Date(startAt.getTime() + durationMinutes * 60000)
 
   await db
@@ -203,7 +203,7 @@ export async function createDashboardAppointment(data: {
     defaultStaff = created!
   }
 
-  const startAt = new Date(`${data.date}T${data.time}:00`)
+  const startAt = new Date(`${data.date}T${data.time}:00-03:00`)
   const endAt = new Date(startAt.getTime() + service.durationMinutes * 60000)
 
   let [client] = await db.select().from(clients)
