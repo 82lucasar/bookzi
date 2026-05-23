@@ -66,9 +66,9 @@ export default function AgendaCalendar({ appointments }: { appointments: Appt[] 
 
   const periodLabel = useMemo(() => {
     if (view === "week") {
-      const first = weekDays[0]
-      const last  = weekDays[6]
-      return `${first.getDate()} ${MONTHS[first.getMonth()].slice(0, 3)} — ${last.getDate()} ${MONTHS[last.getMonth()].slice(0, 3)}`
+      const first = weekDays[0]!
+      const last  = weekDays[6]!
+      return `${first.getDate()} ${MONTHS[first.getMonth()]!.slice(0, 3)} — ${last.getDate()} ${MONTHS[last.getMonth()]!.slice(0, 3)}`
     }
     const now = new Date()
     const m = ((now.getMonth() + monthOffset) % 12 + 12) % 12

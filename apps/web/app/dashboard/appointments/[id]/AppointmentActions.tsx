@@ -243,7 +243,7 @@ export default function AppointmentActions({
                 cursor: "pointer", boxShadow: "0 2px 8px rgba(2,132,199,0.3)",
               }}
             >
-              Confirmar — {MONTHS[calMonth].slice(0, 3)} {selectedDay} a las {selectedSlot}
+              Confirmar — {MONTHS[calMonth]!.slice(0, 3)} {selectedDay} a las {selectedSlot}
             </button>
           )}
         </div>
