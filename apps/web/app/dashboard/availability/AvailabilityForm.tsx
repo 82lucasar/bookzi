@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { saveAvailability, type DayConfig } from "@/lib/actions/availability"
 
 const DAYS_LIST = [
@@ -22,18 +23,16 @@ const TIMES = Array.from({ length: 49 }, (_, i) => {
 })
 
 export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) {
+  const router = useRouter()
   const [schedule, setSchedule] = useState<DayConfig[]>(initial)
-  const [saved,    setSaved]    = useState(false)
   const [saving,   setSaving]   = useState(false)
 
   function toggle(day: string) {
     setSchedule(s => s.map(d => d.day === day ? { ...d, isActive: !d.isActive } : d))
-    setSaved(false)
   }
 
   function setTime(day: string, field: "startTime" | "endTime", value: string) {
     setSchedule(s => s.map(d => d.day === day ? { ...d, [field]: value } : d))
-    setSaved(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -46,8 +45,7 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
       formData.set(`${day}_end`, endTime)
     })
     await saveAvailability(formData)
-    setSaved(true)
-    setSaving(false)
+    router.push("/dashboard")
   }
 
   const selectStyle: React.CSSProperties = {
@@ -179,15 +177,7 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
       })}
 
       {/* Botón guardar */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
-        {saved && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 700, color: "#059669" }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Horarios guardados
-          </div>
-        )}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginTop: 8 }}>
         <button
           type="submit"
           disabled={saving}
