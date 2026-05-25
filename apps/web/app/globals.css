@@ -815,6 +815,26 @@ body {
 .cal-add-text { font-size: 14px; font-weight: 600; color: var(--text-dark); }
 .cal-add-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
 
+/* ── Client booking: pending confirmation ── */
+.confirm-banner-pending {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+  padding: 40px 28px 32px; text-align: center; position: relative; overflow: hidden;
+}
+.confirm-banner-pending::before {
+  content: ''; position: absolute; top: -50px; right: -50px;
+  width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.08);
+}
+
+/* ── Client booking: upload zone ── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 14px; background: var(--bg);
+  padding: 20px 16px; cursor: pointer; text-align: center;
+  transition: border-color 200ms, background 200ms;
+}
+.upload-zone:hover { border-color: var(--primary); background: rgba(2,132,199,0.03); }
+.upload-zone.has-file { border-color: var(--accent); background: rgba(5,150,105,0.04); }
+
 /* ── Desktop: sidebar ── */
 @media (min-width: 1024px) {
   .bottom-nav { display: none; }

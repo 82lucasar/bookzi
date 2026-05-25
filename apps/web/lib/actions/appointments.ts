@@ -18,6 +18,7 @@ export async function getAppointment(id: string) {
       status: appointments.status,
       notes: appointments.notes,
       priceSnapshot: appointments.priceSnapshot,
+      paymentProofUrl: appointments.paymentProofUrl,
       serviceId: appointments.serviceId,
       serviceName: services.name,
       durationMinutes: services.durationMinutes,

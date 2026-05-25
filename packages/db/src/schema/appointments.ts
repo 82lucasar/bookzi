@@ -29,6 +29,9 @@ export const appointments = pgTable("appointments", {
   cancelledBy: varchar("cancelled_by", { length: 20 }), // 'client' | 'professional' | 'system'
   cancelReason: text("cancel_reason"),
 
+  // Comprobante de pago subido por el cliente
+  paymentProofUrl: varchar("payment_proof_url", { length: 1000 }),
+
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),

@@ -4,6 +4,10 @@ import BookingClient from "./BookingClient"
 
 export const dynamic = "force-dynamic"
 
+function initials(name: string): string {
+  return name.split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase() ?? "").join("")
+}
+
 export default async function BookServicePage({
   params,
 }: {
@@ -16,30 +20,53 @@ export default async function BookServicePage({
   const service = data.services.find((s) => s.id === serviceId)
   if (!service) notFound()
 
+  const { business } = data
+
   return (
-    <div className="min-h-screen bg-[var(--color-bg)]">
-      <header className="bg-white border-b border-[var(--color-border)] px-6 py-4 flex items-center gap-3">
+    <div style={{ background: "var(--bg)", minHeight: "100dvh" }}>
+
+      {/* Header gradient igual al perfil público */}
+      <div className="pub-header" style={{ paddingBottom: 20 }}>
+        {/* Back link sutil */}
         <a
           href={`/book/${slug}`}
-          className="text-[var(--color-text-muted)] hover:text-[var(--color-text-dark)] text-sm"
+          style={{
+            position: "absolute", top: 16, left: 16,
+            display: "inline-flex", alignItems: "center", gap: 5,
+            fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.8)",
+            textDecoration: "none",
+          }}
         >
-          ← {data.business.name}
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Volver a servicios
         </a>
-      </header>
 
-      <main className="max-w-lg mx-auto px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[var(--color-text-dark)]">{service.name}</h1>
-          {service.description && (
-            <p className="text-sm text-[var(--color-text-muted)] mt-1">{service.description}</p>
-          )}
+        <div className="pub-avatar-wrap">{initials(business.name)}</div>
+        <div className="pub-name">{business.name}</div>
+        {(business.category || business.address) && (
+          <div className="pub-role">
+            {[business.category, business.address].filter(Boolean).join(" · ")}
+          </div>
+        )}
+        <div className="pub-meta">
+          <span className="pub-meta-item">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Confirmación inmediata
+          </span>
         </div>
+      </div>
 
+      {/* Body */}
+      <div className="page-body">
         <BookingClient
           business={{
-            id: data.business.id,
-            name: data.business.name,
-            slug: data.business.slug,
+            id: business.id,
+            name: business.name,
+            slug: business.slug,
           }}
           service={{
             id: service.id,
@@ -48,11 +75,7 @@ export default async function BookServicePage({
             price: service.price,
           }}
         />
-
-        <p className="text-center text-xs text-[var(--color-text-muted)] mt-10">
-          Powered by <span className="font-semibold text-[var(--color-primary)]">Bookzi</span>
-        </p>
-      </main>
+      </div>
     </div>
   )
 }

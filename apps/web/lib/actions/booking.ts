@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { db } from "@bookzi/db"
 import { businesses, services, staff, clients, appointments, availability } from "@bookzi/db/schema"
 import { eq, and, gte, lt, isNull, ne } from "drizzle-orm"
+import { createClient } from "@/lib/supabase/server"
 
 const DAY_MAP: Record<number, string> = {
   0: "sunday", 1: "monday", 2: "tuesday", 3: "wednesday",
@@ -127,6 +128,7 @@ export async function bookAppointment(formData: FormData) {
   const clientName = formData.get("clientName") as string
   const clientPhone = formData.get("clientPhone") as string
   const clientEmail = formData.get("clientEmail") as string
+  const paymentProofFile = formData.get("paymentProof") as File | null
 
   // Obtener servicio para calcular endAt
   const [service] = await db
@@ -137,15 +139,20 @@ export async function bookAppointment(formData: FormData) {
 
   if (!service) throw new Error("Servicio no encontrado")
 
-  // Obtener staff por defecto del negocio
-  const [defaultStaff] = await db
+  // Obtener staff por defecto del negocio (auto-crear si no existe)
+  let defaultStaff = (await db
     .select()
     .from(staff)
     .where(and(eq(staff.businessId, businessId), isNull(staff.deletedAt)))
     .orderBy(staff.createdAt)
-    .limit(1)
+    .limit(1))[0]
 
-  if (!defaultStaff) throw new Error("Sin personal disponible")
+  if (!defaultStaff) {
+    const [biz] = await db.select({ name: businesses.name }).from(businesses).where(eq(businesses.id, businessId)).limit(1)
+    const [created] = await db.insert(staff).values({ businessId, name: biz?.name ?? "Staff" }).returning()
+    if (!created) throw new Error("Sin personal disponible")
+    defaultStaff = created
+  }
 
   const startAt = new Date(`${dateStr}T${timeStr}:00-03:00`)
   const endAt = new Date(startAt.getTime() + service.durationMinutes * 60000)
@@ -170,6 +177,38 @@ export async function bookAppointment(formData: FormData) {
     client = inserted[0]!
   }
 
+  // Intentar subir comprobante a Supabase Storage (si existe y tiene contenido)
+  let paymentProofUrl: string | null = null
+
+  if (paymentProofFile && paymentProofFile.size > 0) {
+    try {
+      const supabase = await createClient()
+      const ext = paymentProofFile.name.split(".").pop() ?? "jpg"
+      const fileName = `${businessId}/${Date.now()}.${ext}`
+      const arrayBuffer = await paymentProofFile.arrayBuffer()
+      const buffer = new Uint8Array(arrayBuffer)
+
+      const { data: uploadData, error: uploadError } = await supabase
+        .storage
+        .from("payment-proofs")
+        .upload(fileName, buffer, {
+          contentType: paymentProofFile.type || "application/octet-stream",
+          upsert: false,
+        })
+
+      if (!uploadError && uploadData) {
+        const { data: urlData } = supabase
+          .storage
+          .from("payment-proofs")
+          .getPublicUrl(uploadData.path)
+        paymentProofUrl = urlData.publicUrl
+      }
+      // Si falla el upload (bucket no existe, etc.) continuamos sin URL
+    } catch {
+      // Silenciamos el error — el turno se crea igual
+    }
+  }
+
   // Crear el turno
   const inserted = await db.insert(appointments).values({
     businessId,
@@ -181,10 +220,35 @@ export async function bookAppointment(formData: FormData) {
     status: "pending",
     priceSnapshot: service.price,
     currencySnapshot: service.currency,
+    paymentProofUrl,
   }).returning()
 
   redirect(`/book/confirmed?id=${inserted[0]?.id ?? ""}`)
+}
 
+export async function getAppointmentPublic(id: string) {
+  if (!id) return null
+
+  const [row] = await db
+    .select({
+      id: appointments.id,
+      status: appointments.status,
+      startAt: appointments.startAt,
+      endAt: appointments.endAt,
+      priceSnapshot: appointments.priceSnapshot,
+      paymentProofUrl: appointments.paymentProofUrl,
+      serviceName: services.name,
+      clientName: clients.name,
+      businessName: businesses.name,
+    })
+    .from(appointments)
+    .innerJoin(services, eq(appointments.serviceId, services.id))
+    .innerJoin(clients, eq(appointments.clientId, clients.id))
+    .innerJoin(businesses, eq(appointments.businessId, businesses.id))
+    .where(eq(appointments.id, id))
+    .limit(1)
+
+  return row ?? null
 }
 
 function pad(n: number) {

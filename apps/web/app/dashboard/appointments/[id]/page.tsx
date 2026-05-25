@@ -124,6 +124,45 @@ export default async function AppointmentDetailPage({
           </div>
         )}
 
+        {/* Comprobante de pago */}
+        {appt.paymentProofUrl && (
+          <div style={{ background: "white", borderRadius: 20, border: "1.5px solid #E0F0F8", padding: "20px", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 14 }}>
+              Comprobante de pago
+            </p>
+            {/\.(jpe?g|png|gif|webp|avif)(\?|$)/i.test(appt.paymentProofUrl) ? (
+              <a href={appt.paymentProofUrl} target="_blank" rel="noreferrer">
+                <img
+                  src={appt.paymentProofUrl}
+                  alt="Comprobante de pago"
+                  style={{ maxHeight: 200, borderRadius: 12, objectFit: "contain", maxWidth: "100%", display: "block" }}
+                />
+                <p style={{ fontSize: 12, color: "#0284C7", fontWeight: 600, marginTop: 8 }}>
+                  Ver imagen completa →
+                </p>
+              </a>
+            ) : (
+              <a
+                href={appt.paymentProofUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "10px 16px", borderRadius: 10,
+                  background: "rgba(2,132,199,0.08)", color: "#0284C7",
+                  fontWeight: 700, fontSize: 13, textDecoration: "none",
+                  border: "1.5px solid rgba(2,132,199,0.2)",
+                }}
+              >
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Descargar comprobante
+              </a>
+            )}
+          </div>
+        )}
+
       </div>
 
       {/* Acciones (Confirmar / Cancelar / Reprogramar) */}
