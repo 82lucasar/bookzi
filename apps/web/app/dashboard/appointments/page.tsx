@@ -1,4 +1,6 @@
 export const dynamic = "force-dynamic"
+export const revalidate = 0
+import { headers } from "next/headers"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
@@ -24,6 +26,10 @@ export default async function AppointmentsPage({
 }: {
   searchParams: Promise<{ filter?: string }>
 }) {
+  // Impide que el browser use bfcache y muestre versión vieja al volver
+  const h = await headers()
+  void h // fuerza la evaluación dinámica del request
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
@@ -131,7 +137,7 @@ export default async function AppointmentsPage({
                   }}
                 >
                   {/* Card principal — clickeable */}
-                  <Link href={`/dashboard/appointments/${appt.id}`} style={{ display: "block", textDecoration: "none" }}>
+                  <a href={`/dashboard/appointments/${appt.id}`} style={{ display: "block", textDecoration: "none" }}>
                     <div style={{ display: "flex", alignItems: "stretch" }}>
 
                       {/* Columna fecha */}
@@ -196,7 +202,7 @@ export default async function AppointmentsPage({
 
                       </div>
                     </div>
-                  </Link>
+                  </a>
 
                   {/* Acciones rápidas */}
                   {(appt.status === "pending" || appt.status === "confirmed") && (
