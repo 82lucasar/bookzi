@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
 import Link from "next/link"
 import LogoutButton from "./LogoutButton"
+import BookingLinkBox from "./BookingLinkBox"
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -12,6 +13,9 @@ export default async function ProfilePage() {
 
   const business = await getMyBusiness()
   if (!business) redirect("/onboarding/welcome")
+
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://bookzi-three.vercel.app").replace(/\/$/, "")
+  const bookingUrl = `${appUrl}/book/${business.slug}`
 
   const initials = business.name
     .split(" ")
@@ -65,8 +69,7 @@ export default async function ProfilePage() {
             </div>
           )}
           <div style={{ padding: "14px 16px" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Link de reservas</div>
-            <div style={{ fontSize: 14, color: "var(--primary)", fontWeight: 600 }}>bookzi.app/{business.slug}</div>
+            <BookingLinkBox bookingUrl={bookingUrl} />
           </div>
         </div>
 
