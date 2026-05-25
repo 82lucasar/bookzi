@@ -9,7 +9,9 @@ const CONFETTI_COLORS = ["#0284C7", "#38BDF8", "#059669", "#34D399", "#F59E0B"]
 export default function DoneClient({ slug }: Props) {
   const confettiRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
-  const url = `bookzi.app/${slug}`
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://bookzi-three.vercel.app").replace(/\/$/, "")
+  const bookingUrl = `${appUrl}/book/${slug}`
+  const displayUrl = bookingUrl.replace(/^https?:\/\//, "")
 
   useEffect(() => {
     const container = confettiRef.current
@@ -32,14 +34,14 @@ export default function DoneClient({ slug }: Props) {
   }, [])
 
   const copyLink = async () => {
-    try { await navigator.clipboard.writeText(`https://${url}`) } catch {}
+    try { await navigator.clipboard.writeText(bookingUrl) } catch {}
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   const shareLink = () => {
     if (navigator.share) {
-      navigator.share({ url: `https://${url}`, title: "Reservá tu turno" })
+      navigator.share({ url: bookingUrl, title: "Reservá tu turno" })
     } else {
       copyLink()
     }
@@ -60,7 +62,7 @@ export default function DoneClient({ slug }: Props) {
         <p className="success-body">Compartí tu link de reservas con tus clientes y empezá a recibir turnos de inmediato.</p>
 
         <div className="link-box">
-          <span className="link-url">{url}</span>
+          <span className="link-url">{displayUrl}</span>
           <button className={`copy-btn${copied ? " copied" : ""}`} onClick={copyLink}>
             {copied ? "¡Copiado!" : "Copiar"}
           </button>
