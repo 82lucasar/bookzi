@@ -51,7 +51,7 @@ export default async function AppointmentDetailPage({
       <div style={{
         background: "white", borderBottom: "1.5px solid #E0F0F8",
         padding: "0 16px", height: 60,
-        display: "flex", alignItems: "center", gap: 12,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
         position: "sticky", top: 0, zIndex: 40,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
