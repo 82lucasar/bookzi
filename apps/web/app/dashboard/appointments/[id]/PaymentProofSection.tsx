@@ -7,7 +7,7 @@ import { confirmAppointment, cancelAppointment } from "@/lib/actions/appointment
 type Props = {
   appointmentId: string
   status: string
-  paymentProofUrl: string
+  paymentProofUrl: string | null
   priceSnapshot: string | null
   clientName: string
   clientPhone: string | null
@@ -34,11 +34,41 @@ export default function PaymentProofSection({
   const [loading, setLoading] = useState<"validate" | "reject" | null>(null)
 
   const isPending = status === "pending"
-  const showActions = isPending
+  const showActions = isPending && !!paymentProofUrl
 
   const amount = priceSnapshot && Number(priceSnapshot) > 0
     ? `$${Number(priceSnapshot).toLocaleString("es-AR")}`
     : null
+
+  // Sin comprobante — mostrar estado vacío
+  if (!paymentProofUrl) {
+    return (
+      <div style={{
+        background: "white", borderRadius: 20, border: "1.5px solid #E0F0F8",
+        padding: "20px", boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+            Comprobante de pago
+          </p>
+          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: "rgba(245,158,11,0.08)", color: "#B45309", border: "1px solid rgba(245,158,11,0.2)" }}>
+            Sin comprobante
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(100,116,139,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 7v4M11 15h.01" stroke="#64748B" strokeWidth="1.6" strokeLinecap="round"/>
+              <circle cx="11" cy="11" r="9" stroke="#64748B" strokeWidth="1.5"/>
+            </svg>
+          </div>
+          <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.5 }}>
+            El cliente aún no subió el comprobante de pago. Si ya realizó la transferencia, pedile que reenvíe el comprobante por WhatsApp.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   async function handleValidate() {
     setLoading("validate")
@@ -58,6 +88,9 @@ export default function PaymentProofSection({
 
   const isLoading = loading !== null
 
+  // A partir de aquí paymentProofUrl no es null (early return arriba lo garantiza)
+  const proofUrl = paymentProofUrl as string
+
   return (
     <>
       {/* ── Sección compacta ── */}
@@ -74,10 +107,10 @@ export default function PaymentProofSection({
           {/* Ícono del archivo */}
           <div style={{
             width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-            background: isPdf(paymentProofUrl) ? "rgba(220,38,38,0.08)" : "rgba(2,132,199,0.08)",
+            background: isPdf(proofUrl) ? "rgba(220,38,38,0.08)" : "rgba(2,132,199,0.08)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            {isPdf(paymentProofUrl) ? (
+            {isPdf(proofUrl) ? (
               <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
                 <rect x="4" y="2" width="14" height="18" rx="2" stroke="#DC2626" strokeWidth="1.6"/>
                 <path d="M4 2h10l4 4v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" stroke="#DC2626" strokeWidth="1.5"/>
@@ -95,7 +128,7 @@ export default function PaymentProofSection({
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontSize: 13, color: "#64748B", fontWeight: 500, marginBottom: 2 }}>
-              {isPdf(paymentProofUrl) ? "Comprobante PDF" : "Comprobante de imagen"}
+              {isPdf(proofUrl) ? "Comprobante PDF" : "Comprobante de imagen"}
             </p>
             {amount && (
               <p style={{ fontSize: 22, fontWeight: 900, color: "#059669", letterSpacing: "-0.5px" }}>
@@ -208,7 +241,7 @@ export default function PaymentProofSection({
               }}>
                 {/* Tipo de comprobante */}
                 <p style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
-                  Comprobante de pago · {isPdf(paymentProofUrl) ? "PDF" : "Imagen"}
+                  Comprobante de pago · {isPdf(proofUrl) ? "PDF" : "Imagen"}
                 </p>
 
                 {/* Monto */}
@@ -235,9 +268,9 @@ export default function PaymentProofSection({
 
                 {/* Preview del archivo */}
                 <div style={{ borderTop: "1px solid #E0F0F8", paddingTop: 14, marginTop: 4 }}>
-                  {isPdf(paymentProofUrl) ? (
+                  {isPdf(proofUrl) ? (
                     <a
-                      href={paymentProofUrl}
+                      href={proofUrl}
                       target="_blank"
                       rel="noreferrer"
                       style={{
@@ -252,9 +285,9 @@ export default function PaymentProofSection({
                       <span style={{ fontSize: 13, fontWeight: 700, color: "#DC2626" }}>Abrir PDF completo →</span>
                     </a>
                   ) : (
-                    <a href={paymentProofUrl} target="_blank" rel="noreferrer" style={{ display: "block" }}>
+                    <a href={proofUrl} target="_blank" rel="noreferrer" style={{ display: "block" }}>
                       <img
-                        src={paymentProofUrl}
+                        src={proofUrl}
                         alt="Comprobante"
                         style={{ width: "100%", borderRadius: 12, objectFit: "contain", maxHeight: 280, display: "block" }}
                       />

@@ -128,12 +128,12 @@ export default async function AppointmentDetailPage({
           </div>
         )}
 
-        {/* Comprobante de pago */}
-        {appt.paymentProofUrl && (
+        {/* Comprobante de pago — siempre visible para pendientes y confirmados */}
+        {(appt.status === "pending" || appt.status === "confirmed" || appt.paymentProofUrl) && (
           <PaymentProofSection
             appointmentId={appt.id}
             status={appt.status}
-            paymentProofUrl={appt.paymentProofUrl}
+            paymentProofUrl={appt.paymentProofUrl ?? null}
             priceSnapshot={appt.priceSnapshot}
             clientName={appt.clientName}
             clientPhone={appt.clientPhone}

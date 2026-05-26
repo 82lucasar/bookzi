@@ -188,6 +188,9 @@ export async function bookAppointment(formData: FormData) {
       const arrayBuffer = await paymentProofFile.arrayBuffer()
       const buffer = new Uint8Array(arrayBuffer)
 
+      // Crear bucket si no existe
+      await supabase.storage.createBucket("payment-proofs", { public: true }).catch(() => null)
+
       const { data: uploadData, error: uploadError } = await supabase
         .storage
         .from("payment-proofs")
@@ -203,9 +206,8 @@ export async function bookAppointment(formData: FormData) {
           .getPublicUrl(uploadData.path)
         paymentProofUrl = urlData.publicUrl
       }
-      // Si falla el upload (bucket no existe, etc.) continuamos sin URL
     } catch {
-      // Silenciamos el error — el turno se crea igual
+      // Continuamos sin URL si falla el upload
     }
   }
 
