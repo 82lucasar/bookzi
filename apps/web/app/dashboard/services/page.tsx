@@ -198,27 +198,7 @@ export default async function ServicesPage() {
                   display: "flex", justifyContent: "flex-end",
                 }}>
                   <form action={deleteService.bind(null, service.id)}>
-                    <button
-                      type="submit"
-                      style={{
-                        height: 32, padding: "0 14px", borderRadius: 8,
-                        background: "transparent",
-                        border: "1px solid var(--border)",
-                        color: "var(--text-muted)", fontSize: 12, fontWeight: 700,
-                        cursor: "pointer", fontFamily: "inherit",
-                        transition: "all 150ms",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = "rgba(220,38,38,0.06)"
-                        ;(e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(220,38,38,0.25)"
-                        ;(e.currentTarget as HTMLButtonElement).style.color = "#DC2626"
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = "transparent"
-                        ;(e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"
-                        ;(e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"
-                      }}
-                    >
+                    <button type="submit" className="service-delete-btn">
                       Eliminar
                     </button>
                   </form>
