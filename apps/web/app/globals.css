@@ -301,7 +301,38 @@ body {
 
 /* ── Onboarding ── */
 .ob-screen { min-height: 100dvh; display: flex; flex-direction: column; }
-.ob-header { padding: 20px 20px 0; display: flex; align-items: center; gap: 12px; }
+.ob-header { padding: 20px 20px 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ob-header-left { display: flex; align-items: center; gap: 12px; }
+
+/* ── Logo home button ── */
+.logo-home-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 10px; text-decoration: none;
+  background: rgba(2,132,199,0.09); border: 1px solid rgba(2,132,199,0.15);
+  transition: background 150ms;
+}
+.logo-home-btn:hover { background: rgba(2,132,199,0.15); }
+.logo-home-btn .logo-mark {
+  width: 22px; height: 22px; border-radius: 6px; background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.logo-home-btn .logo-text { font-size: 13px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.2px; }
+
+/* Variante blanca (sobre fondos oscuros) */
+.logo-home-btn-white {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 10px; text-decoration: none;
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+  transition: background 150ms;
+}
+.logo-home-btn-white:hover { background: rgba(255,255,255,0.22); }
+.logo-home-btn-white .logo-mark {
+  width: 22px; height: 22px; border-radius: 6px; background: rgba(255,255,255,0.9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: var(--primary); flex-shrink: 0;
+}
+.logo-home-btn-white .logo-text { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 .ob-back-btn {
   width: 36px; height: 36px; border-radius: 10px; background: var(--bg-white);
   border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;

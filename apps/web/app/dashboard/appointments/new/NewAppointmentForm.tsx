@@ -144,10 +144,16 @@ export default function NewAppointmentForm({
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
         <header className="app-header">
-          <button className="back-btn" onClick={() => router.back()}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </button>
-          <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)", flex: 1 }}>Nueva reserva</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button className="back-btn" onClick={() => router.back()}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Nueva reserva</span>
+          </div>
+          <a href="/dashboard" className="logo-home-btn">
+            <div className="logo-mark">B</div>
+            <span className="logo-text">Bookzi</span>
+          </a>
         </header>
 
         {/* Paso "done" — pantalla de éxito */}

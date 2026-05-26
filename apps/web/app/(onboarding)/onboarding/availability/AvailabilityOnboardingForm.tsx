@@ -79,16 +79,22 @@ export default function AvailabilityOnboardingForm({ services }: Props) {
   return (
     <div className="ob-screen">
       <div className="ob-header">
-        <button
-          className="ob-back-btn"
-          onClick={() => router.push("/onboarding/services")}
-          type="button"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        <span className="step-label">Paso 3 de 3</span>
+        <div className="ob-header-left">
+          <button
+            className="ob-back-btn"
+            onClick={() => router.push("/onboarding/services")}
+            type="button"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <span className="step-label">Paso 3 de 3</span>
+        </div>
+        <a href="/dashboard" className="logo-home-btn">
+          <div className="logo-mark">B</div>
+          <span className="logo-text">Bookzi</span>
+        </a>
       </div>
 
       <div className="progress-wrap">

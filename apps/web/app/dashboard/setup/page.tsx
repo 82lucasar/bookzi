@@ -20,12 +20,18 @@ export default function SetupPage() {
   return (
     <div className="ob-screen">
       <div className="ob-header">
-        <Link href="/onboarding/welcome" className="ob-back-btn">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <div className="ob-header-left">
+          <Link href="/onboarding/welcome" className="ob-back-btn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
+          <span className="step-label">Paso 1 de 3</span>
+        </div>
+        <Link href="/dashboard" className="logo-home-btn">
+          <div className="logo-mark">B</div>
+          <span className="logo-text">Bookzi</span>
         </Link>
-        <span className="step-label">Paso 1 de 3</span>
       </div>
 
       <div className="progress-wrap">

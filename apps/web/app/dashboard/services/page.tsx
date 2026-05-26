@@ -43,21 +43,27 @@ export default async function ServicesPage() {
           </Link>
           <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Servicios</span>
         </div>
-        <Link
-          href="/dashboard/services/new"
-          style={{
-            display: "flex", alignItems: "center", gap: 6,
-            height: 36, padding: "0 14px", borderRadius: 10,
-            background: "linear-gradient(135deg, var(--primary), #0369A1)",
-            color: "white", fontSize: 13, fontWeight: 700,
-            textDecoration: "none", boxShadow: "0 2px 8px rgba(2,132,199,0.30)",
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-            <path d="M6.5 1v11M1 6.5h11" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-          Nuevo
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Link href="/dashboard" className="logo-home-btn">
+            <div className="logo-mark">B</div>
+            <span className="logo-text">Bookzi</span>
+          </Link>
+          <Link
+            href="/dashboard/services/new"
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              height: 36, padding: "0 14px", borderRadius: 10,
+              background: "linear-gradient(135deg, var(--primary), #0369A1)",
+              color: "white", fontSize: 13, fontWeight: 700,
+              textDecoration: "none", boxShadow: "0 2px 8px rgba(2,132,199,0.30)",
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M6.5 1v11M1 6.5h11" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            Nuevo
+          </Link>
+        </div>
       </header>
 
       <div style={{ flex: 1, padding: "20px 16px 100px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto", width: "100%" }}>

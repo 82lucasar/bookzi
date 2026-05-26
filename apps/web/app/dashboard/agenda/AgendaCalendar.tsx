@@ -201,10 +201,16 @@ export default function AgendaCalendar({ appointments }: { appointments: Appt[] 
           </button>
           <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Agenda</span>
         </div>
-        <Link href="/dashboard/appointments/new" style={{ display: "flex", alignItems: "center", gap: 6, height: 36, padding: "0 14px", borderRadius: 10, background: "linear-gradient(135deg, var(--primary), #0369A1)", color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", boxShadow: "0 2px 8px rgba(2,132,199,0.28)" }}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
-          Nuevo turno
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <a href="/dashboard" className="logo-home-btn">
+            <div className="logo-mark">B</div>
+            <span className="logo-text">Bookzi</span>
+          </a>
+          <Link href="/dashboard/appointments/new" style={{ display: "flex", alignItems: "center", gap: 6, height: 36, padding: "0 14px", borderRadius: 10, background: "linear-gradient(135deg, var(--primary), #0369A1)", color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", boxShadow: "0 2px 8px rgba(2,132,199,0.28)" }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+            Nuevo turno
+          </Link>
+        </div>
       </header>
 
       {/* ── Sub-header: toggle + nav ── */}

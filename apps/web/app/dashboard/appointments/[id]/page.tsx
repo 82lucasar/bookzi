@@ -54,15 +54,21 @@ export default async function AppointmentDetailPage({
         display: "flex", alignItems: "center", gap: 12,
         position: "sticky", top: 0, zIndex: 40,
       }}>
-        <a
-          href="/dashboard/appointments"
-          style={{ width: 36, height: 36, borderRadius: 10, border: "1.5px solid #E0F0F8", display: "flex", alignItems: "center", justifyContent: "center", color: "#0F172A", textDecoration: "none", flexShrink: 0 }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <a
+            href="/dashboard/appointments"
+            style={{ width: 36, height: 36, borderRadius: 10, border: "1.5px solid #E0F0F8", display: "flex", alignItems: "center", justifyContent: "center", color: "#0F172A", textDecoration: "none", flexShrink: 0 }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
+          <span style={{ fontSize: 17, fontWeight: 700, color: "#0F172A" }}>Detalle del turno</span>
+        </div>
+        <a href="/dashboard" className="logo-home-btn">
+          <div className="logo-mark">B</div>
+          <span className="logo-text">Bookzi</span>
         </a>
-        <span style={{ fontSize: 17, fontWeight: 700, color: "#0F172A" }}>Detalle del turno</span>
       </div>
 
       <div style={{ padding: "20px 16px 140px", maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", gap: 14 }}>

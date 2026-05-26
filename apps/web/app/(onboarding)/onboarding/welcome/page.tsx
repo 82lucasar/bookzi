@@ -65,6 +65,12 @@ export default async function WelcomePage() {
       `}</style>
 
       <div className="hero">
+        {/* Botón home esquina superior derecha */}
+        <a href="/dashboard" className="logo-home-btn-white" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
+          <div className="logo-mark">B</div>
+          <span className="logo-text">Inicio</span>
+        </a>
+
         <div className="w-logo-mark">B</div>
         <div className="w-logo-word">Bookzi</div>
 
