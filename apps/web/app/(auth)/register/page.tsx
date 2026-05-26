@@ -435,7 +435,6 @@ export default function RegisterPage() {
                     border: "1.5px solid #E2E8F0",
                     cursor: "pointer", fontFamily: "inherit",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                    transition: "border-color 200ms",
                   }}
                 >
                   <svg width="20" height="20" viewBox="0 0 48 48">
