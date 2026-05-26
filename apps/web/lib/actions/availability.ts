@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache"
 import { db } from "@bookzi/db"
-import { availability } from "@bookzi/db/schema"
-import { eq, and, isNull } from "drizzle-orm"
+import { availability, availabilityServices } from "@bookzi/db/schema"
+import { eq, and, isNull, inArray } from "drizzle-orm"
 import { getMyBusiness } from "./business"
 
 export type DayConfig = {
@@ -11,6 +11,7 @@ export type DayConfig = {
   isActive: boolean
   startTime: string
   endTime: string
+  enabledServiceIds: string[]
 }
 
 const DAYS_ORDER = [
@@ -31,22 +32,33 @@ export async function getAvailability(): Promise<DayConfig[]> {
 
   if (rows.length === 0) return getDefaultSchedule()
 
+  const availIds = rows.map(r => r.id)
+  const svcRows = availIds.length > 0
+    ? await db
+        .select()
+        .from(availabilityServices)
+        .where(inArray(availabilityServices.availabilityId, availIds))
+    : []
+
   return DAYS_ORDER.map((day) => {
     const row = rows.find((r) => r.dayOfWeek === day)
+    const svcIds = row
+      ? svcRows.filter(s => s.availabilityId === row.id && s.isEnabled).map(s => s.serviceId)
+      : []
     return {
       day,
       isActive: row?.isActive ?? false,
       startTime: (row?.startTime ?? "09:00").slice(0, 5),
       endTime: (row?.endTime ?? "18:00").slice(0, 5),
+      enabledServiceIds: svcIds,
     }
   })
 }
 
-export async function saveAvailability(formData: FormData) {
+export async function saveAvailability(days: DayConfig[]) {
   const business = await getMyBusiness()
   if (!business) return
 
-  // Borra la configuración actual del negocio (sin staff)
   await db
     .delete(availability)
     .where(and(
@@ -54,16 +66,33 @@ export async function saveAvailability(formData: FormData) {
       isNull(availability.staffId),
     ))
 
-  const inserts = DAYS_ORDER.map((day) => ({
-    businessId: business.id,
-    staffId: null,
-    dayOfWeek: day as typeof availability.$inferInsert["dayOfWeek"],
-    startTime: formData.get(`${day}_start`) as string || "09:00",
-    endTime: formData.get(`${day}_end`) as string || "18:00",
-    isActive: formData.get(`${day}_active`) === "on",
-  }))
+  const inserted = await db.insert(availability).values(
+    DAYS_ORDER.map((day) => {
+      const d = days.find(x => x.day === day)
+      return {
+        businessId: business.id,
+        staffId: null,
+        dayOfWeek: day as typeof availability.$inferInsert["dayOfWeek"],
+        startTime: d?.startTime ?? "09:00",
+        endTime: d?.endTime ?? "18:00",
+        isActive: d?.isActive ?? false,
+      }
+    })
+  ).returning()
 
-  await db.insert(availability).values(inserts)
+  const svcInserts: { availabilityId: string; serviceId: string; isEnabled: boolean }[] = []
+  for (const insertedRow of inserted) {
+    const dayConfig = days.find(d => d.day === insertedRow.dayOfWeek)
+    if (dayConfig?.enabledServiceIds?.length) {
+      for (const sid of dayConfig.enabledServiceIds) {
+        svcInserts.push({ availabilityId: insertedRow.id, serviceId: sid, isEnabled: true })
+      }
+    }
+  }
+  if (svcInserts.length > 0) {
+    await db.insert(availabilityServices).values(svcInserts)
+  }
+
   revalidatePath("/dashboard/availability")
 }
 
@@ -73,5 +102,6 @@ function getDefaultSchedule(): DayConfig[] {
     isActive: !["saturday", "sunday"].includes(day),
     startTime: "09:00",
     endTime: "18:00",
+    enabledServiceIds: [],
   }))
 }

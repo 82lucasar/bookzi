@@ -11,6 +11,7 @@ export const services = pgTable("services", {
   bufferMinutes:   integer("buffer_minutes").notNull().default(0),
   price:           numeric("price", { precision: 10, scale: 2 }),
   currency:        varchar("currency", { length: 3 }).default("ARS"),
+  maxPerDay:       integer("max_per_day"),
   isActive:        boolean("is_active").notNull().default(true),
   createdAt:       timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt:       timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

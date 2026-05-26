@@ -47,7 +47,7 @@ export async function createService(formData: FormData) {
 }
 
 export async function saveOnboardingServices(
-  servicesData: Array<{ name: string; durationMinutes: number; price: string }>
+  servicesData: Array<{ name: string; durationMinutes: number; price: string; maxPerDay?: number | null }>
 ) {
   const business = await getMyBusiness()
   if (!business) redirect("/dashboard/setup")
@@ -60,13 +60,14 @@ export async function saveOnboardingServices(
       durationMinutes: s.durationMinutes,
       price: s.price?.trim() || null,
       currency: "ARS" as const,
+      maxPerDay: s.maxPerDay ?? null,
     }))
 
   if (inserts.length > 0) {
     await db.insert(services).values(inserts)
   }
 
-  redirect("/onboarding/done")
+  redirect("/onboarding/availability")
 }
 
 export async function deleteService(serviceId: string) {

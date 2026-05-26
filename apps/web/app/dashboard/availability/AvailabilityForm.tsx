@@ -5,16 +5,15 @@ import { useRouter } from "next/navigation"
 import { saveAvailability, type DayConfig } from "@/lib/actions/availability"
 
 const DAYS_LIST = [
-  { key: "monday",    label: "Lunes" },
-  { key: "tuesday",   label: "Martes" },
+  { key: "monday",    label: "Lunes"     },
+  { key: "tuesday",   label: "Martes"    },
   { key: "wednesday", label: "Miércoles" },
-  { key: "thursday",  label: "Jueves" },
-  { key: "friday",    label: "Viernes" },
-  { key: "saturday",  label: "Sábado" },
-  { key: "sunday",    label: "Domingo" },
+  { key: "thursday",  label: "Jueves"    },
+  { key: "friday",    label: "Viernes"   },
+  { key: "saturday",  label: "Sábado"    },
+  { key: "sunday",    label: "Domingo"   },
 ]
 
-// 00:00 → 24:00 en pasos de 30 min
 const TIMES = Array.from({ length: 49 }, (_, i) => {
   const total = i * 30
   const h = String(Math.floor(total / 60)).padStart(2, "0")
@@ -22,10 +21,18 @@ const TIMES = Array.from({ length: 49 }, (_, i) => {
   return `${h}:${m}`
 })
 
-export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) {
+type ServiceItem = { id: string; name: string }
+
+export default function AvailabilityForm({
+  initial,
+  services,
+}: {
+  initial: DayConfig[]
+  services: ServiceItem[]
+}) {
   const router = useRouter()
   const [schedule, setSchedule] = useState<DayConfig[]>(initial)
-  const [saving,   setSaving]   = useState(false)
+  const [saving, setSaving] = useState(false)
 
   function toggle(day: string) {
     setSchedule(s => s.map(d => d.day === day ? { ...d, isActive: !d.isActive } : d))
@@ -35,16 +42,20 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
     setSchedule(s => s.map(d => d.day === day ? { ...d, [field]: value } : d))
   }
 
+  function toggleService(day: string, serviceId: string) {
+    setSchedule(s => s.map(d => {
+      if (d.day !== day) return d
+      const current = new Set(d.enabledServiceIds)
+      if (current.has(serviceId)) current.delete(serviceId)
+      else current.add(serviceId)
+      return { ...d, enabledServiceIds: Array.from(current) }
+    }))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
-    const formData = new FormData()
-    schedule.forEach(({ day, isActive, startTime, endTime }) => {
-      if (isActive) formData.set(`${day}_active`, "on")
-      formData.set(`${day}_start`, startTime)
-      formData.set(`${day}_end`, endTime)
-    })
-    await saveAvailability(formData)
+    await saveAvailability(schedule)
     router.push("/dashboard")
   }
 
@@ -82,26 +93,16 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
               transition: "background 150ms, border-color 150ms",
             }}
           >
-            {/* Fila superior: checkbox + nombre del día */}
-            <label style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              cursor: "pointer",
-              userSelect: "none",
-            }}>
-              {/* Checkbox custom */}
+            {/* Fila superior */}
+            <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer", userSelect: "none" }}>
               <div
                 onClick={() => toggle(key)}
                 style={{
-                  width: 22, height: 22,
-                  borderRadius: 6,
+                  width: 22, height: 22, borderRadius: 6,
                   border: `2px solid ${day.isActive ? "var(--color-primary, #0284C7)" : "#CBD5E1"}`,
                   background: day.isActive ? "var(--color-primary, #0284C7)" : "white",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  flexShrink: 0,
-                  transition: "all 150ms",
-                  cursor: "pointer",
+                  flexShrink: 0, transition: "all 150ms", cursor: "pointer",
                 }}
               >
                 {day.isActive && (
@@ -110,90 +111,83 @@ export default function AvailabilityForm({ initial }: { initial: DayConfig[] }) 
                   </svg>
                 )}
               </div>
-
               <span style={{
-                fontSize: 15,
-                fontWeight: 700,
+                fontSize: 15, fontWeight: 700,
                 color: day.isActive ? "var(--color-text-dark, #0F172A)" : "#94A3B8",
                 transition: "color 150ms",
               }}>
                 {label}
               </span>
-
               {!day.isActive && (
-                <span style={{
-                  marginLeft: "auto",
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: "#94A3B8",
-                }}>
+                <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 500, color: "#94A3B8" }}>
                   No disponible
                 </span>
               )}
             </label>
 
-            {/* Fila inferior: selectores de horario (solo si activo) */}
             {day.isActive && (
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                paddingLeft: 34,
-                flexWrap: "wrap",
-              }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    Desde
-                  </span>
-                  <select
-                    value={day.startTime}
-                    onChange={e => setTime(key, "startTime", e.target.value)}
-                    style={selectStyle}
-                  >
-                    {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
+              <>
+                {/* Horarios */}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: 34, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>Desde</span>
+                    <select value={day.startTime} onChange={e => setTime(key, "startTime", e.target.value)} style={selectStyle}>
+                      {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ alignSelf: "flex-end", paddingBottom: 10, color: "#94A3B8", fontWeight: 700, fontSize: 16 }}>—</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>Hasta</span>
+                    <select value={day.endTime} onChange={e => setTime(key, "endTime", e.target.value)} style={selectStyle}>
+                      {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
                 </div>
 
-                <div style={{ alignSelf: "flex-end", paddingBottom: 10, color: "#94A3B8", fontWeight: 700, fontSize: 16 }}>
-                  —
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    Hasta
-                  </span>
-                  <select
-                    value={day.endTime}
-                    onChange={e => setTime(key, "endTime", e.target.value)}
-                    style={selectStyle}
-                  >
-                    {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-              </div>
+                {/* Servicios */}
+                {services.length > 0 && (
+                  <div style={{ paddingLeft: 34, borderTop: "1px solid var(--color-border, #E0F0F8)", paddingTop: 12 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                      Servicios habilitados
+                    </span>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+                      {services.map(svc => {
+                        const enabled = day.enabledServiceIds.includes(svc.id)
+                        return (
+                          <div key={svc.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                            <span style={{ fontSize: 14, color: enabled ? "#0F172A" : "#94A3B8", fontWeight: 500, transition: "color 150ms" }}>
+                              {svc.name}
+                            </span>
+                            <label className="toggle" style={{ flexShrink: 0 }}>
+                              <input
+                                type="checkbox"
+                                checked={enabled}
+                                onChange={() => toggleService(key, svc.id)}
+                              />
+                              <div className="toggle-track"></div>
+                              <div className="toggle-thumb"></div>
+                            </label>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )
       })}
 
-      {/* Botón guardar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginTop: 8 }}>
         <button
           type="submit"
           disabled={saving}
           style={{
-            marginLeft: "auto",
-            height: 44,
-            padding: "0 28px",
-            borderRadius: 12,
-            border: "none",
-            background: saving ? "#0369A1" : "linear-gradient(135deg, #0284C7, #0369A1)",
-            color: "white",
-            fontWeight: 700,
-            fontSize: 14,
-            fontFamily: "inherit",
-            cursor: saving ? "not-allowed" : "pointer",
-            opacity: saving ? 0.8 : 1,
+            marginLeft: "auto", height: 44, padding: "0 28px", borderRadius: 12,
+            border: "none", background: saving ? "#0369A1" : "linear-gradient(135deg, #0284C7, #0369A1)",
+            color: "white", fontWeight: 700, fontSize: 14, fontFamily: "inherit",
+            cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.8 : 1,
             boxShadow: "0 2px 8px rgba(2,132,199,0.30)",
           }}
         >

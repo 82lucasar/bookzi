@@ -186,6 +186,14 @@ export default async function ServicesPage() {
                           ${Number(service.price).toLocaleString("es-AR")}
                         </span>
                       )}
+                      {service.maxPerDay && (
+                        <span style={{
+                          fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
+                          background: "rgba(5,150,105,0.08)", color: "var(--accent)",
+                        }}>
+                          👥 Máx. {service.maxPerDay}/día
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
