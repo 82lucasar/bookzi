@@ -150,10 +150,7 @@ export default function NewAppointmentForm({
             </button>
             <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Nueva reserva</span>
           </div>
-          <a href="/dashboard" className="logo-home-btn">
-            <div className="logo-mark">B</div>
-            <span className="logo-text">Bookzi</span>
-          </a>
+          <a href="/dashboard" className="logo-home-btn">B</a>
         </header>
 
         {/* Paso "done" — pantalla de éxito */}

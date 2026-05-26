@@ -91,10 +91,7 @@ export default function AvailabilityOnboardingForm({ services }: Props) {
           </button>
           <span className="step-label">Paso 3 de 3</span>
         </div>
-        <a href="/dashboard" className="logo-home-btn">
-          <div className="logo-mark">B</div>
-          <span className="logo-text">Bookzi</span>
-        </a>
+        <a href="/dashboard" className="logo-home-btn">B</a>
       </div>
 
       <div className="progress-wrap">

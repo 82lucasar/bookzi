@@ -5,6 +5,7 @@ import { getMyBusiness } from "@/lib/actions/business"
 import { getAvailability } from "@/lib/actions/availability"
 import { getServices } from "@/lib/actions/services"
 import AvailabilityForm from "./AvailabilityForm"
+import Link from "next/link"
 
 export default async function AvailabilityPage() {
   const supabase = await createClient()
@@ -22,15 +23,21 @@ export default async function AvailabilityPage() {
   const services = serviceList.map(s => ({ id: s.id, name: s.name }))
 
   return (
-    <div>
-      <div className="bg-white border-b border-[var(--color-border)] px-6 lg:px-10 py-6">
-        <h1 className="text-2xl font-extrabold text-[var(--color-text-dark)]">Horarios de atención</h1>
-        <p className="text-sm text-[var(--color-text-muted)] mt-0.5">
-          Configurá los días y horarios en que tu negocio acepta reservas
-        </p>
-      </div>
+    <div style={{ background: "var(--bg)", minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
 
-      <div className="px-6 lg:px-10 py-8 max-w-2xl">
+      <header className="app-header">
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Link href="/dashboard/profile" className="back-btn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
+          <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Horarios de atención</span>
+        </div>
+        <Link href="/dashboard" className="logo-home-btn">B</Link>
+      </header>
+
+      <div style={{ flex: 1, padding: "20px 16px 100px", maxWidth: 480, margin: "0 auto", width: "100%" }}>
         <AvailabilityForm initial={schedule} services={services} />
       </div>
     </div>

@@ -34,10 +34,7 @@ export default async function ProfilePage() {
           </Link>
           <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Perfil</span>
         </div>
-        <Link href="/dashboard" className="logo-home-btn">
-          <div className="logo-mark">B</div>
-          <span className="logo-text">Bookzi</span>
-        </Link>
+        <Link href="/dashboard" className="logo-home-btn">B</Link>
       </header>
 
       <div style={{ flex: 1, padding: "24px 16px 100px", display: "flex", flexDirection: "column", gap: 20, maxWidth: 480, margin: "0 auto", width: "100%" }}>

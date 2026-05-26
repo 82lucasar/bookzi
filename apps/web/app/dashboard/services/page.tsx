@@ -44,10 +44,7 @@ export default async function ServicesPage() {
           <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Servicios</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Link href="/dashboard" className="logo-home-btn">
-            <div className="logo-mark">B</div>
-            <span className="logo-text">Bookzi</span>
-          </Link>
+          <Link href="/dashboard" className="logo-home-btn">B</Link>
           <Link
             href="/dashboard/services/new"
             style={{

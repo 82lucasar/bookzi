@@ -25,10 +25,7 @@ export default function NewServicePage() {
           </Link>
           <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Nuevo servicio</span>
         </div>
-        <Link href="/dashboard" className="logo-home-btn">
-          <div className="logo-mark">B</div>
-          <span className="logo-text">Bookzi</span>
-        </Link>
+        <Link href="/dashboard" className="logo-home-btn">B</Link>
       </header>
 
       <div style={{ flex: 1, padding: "20px 16px 40px", maxWidth: 480, margin: "0 auto", width: "100%" }}>

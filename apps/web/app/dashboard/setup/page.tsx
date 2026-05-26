@@ -28,10 +28,7 @@ export default function SetupPage() {
           </Link>
           <span className="step-label">Paso 1 de 3</span>
         </div>
-        <Link href="/dashboard" className="logo-home-btn">
-          <div className="logo-mark">B</div>
-          <span className="logo-text">Bookzi</span>
-        </Link>
+        <Link href="/dashboard" className="logo-home-btn">B</Link>
       </div>
 
       <div className="progress-wrap">

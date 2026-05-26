@@ -65,10 +65,7 @@ export default async function AppointmentDetailPage({
           </a>
           <span style={{ fontSize: 17, fontWeight: 700, color: "#0F172A" }}>Detalle del turno</span>
         </div>
-        <a href="/dashboard" className="logo-home-btn">
-          <div className="logo-mark">B</div>
-          <span className="logo-text">Bookzi</span>
-        </a>
+        <a href="/dashboard" className="logo-home-btn">B</a>
       </div>
 
       <div style={{ padding: "20px 16px 140px", maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", gap: 14 }}>
