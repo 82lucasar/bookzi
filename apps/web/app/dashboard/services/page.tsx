@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
 import { getServices, deleteService } from "@/lib/actions/services"
+import Link from "next/link"
 
 function formatDuration(minutes: number) {
   if (minutes < 60) return `${minutes} min`
@@ -10,6 +11,14 @@ function formatDuration(minutes: number) {
   const m = minutes % 60
   return m > 0 ? `${h}h ${m}min` : `${h}h`
 }
+
+const PALETTE = [
+  { bg: "rgba(2,132,199,0.10)",   color: "#0284C7" },
+  { bg: "rgba(124,58,237,0.10)",  color: "#7C3AED" },
+  { bg: "rgba(5,150,105,0.10)",   color: "#059669" },
+  { bg: "rgba(234,88,12,0.10)",   color: "#EA580C" },
+  { bg: "rgba(219,39,119,0.10)",  color: "#DB2777" },
+]
 
 export default async function ServicesPage() {
   const supabase = await createClient()
@@ -22,130 +31,225 @@ export default async function ServicesPage() {
   const serviceList = await getServices()
 
   return (
-    <div className="min-h-screen">
+    <div style={{ background: "var(--bg)", minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
 
-      {/* Page header */}
-      <div
-        className="bg-white px-6 lg:px-10 py-7 flex items-center justify-between"
-        style={{ borderBottom: "1.5px solid var(--color-border)" }}
-      >
-        <div>
-          <h1 className="text-2xl font-extrabold text-[var(--color-text-dark)]" style={{ letterSpacing: "-0.5px" }}>
-            Servicios
-          </h1>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1 font-medium">
-            Administrá los servicios que ofrecés y sus precios
-          </p>
+      {/* Header */}
+      <header className="app-header">
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Link href="/dashboard/profile" className="back-btn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
+          <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-dark)" }}>Servicios</span>
         </div>
-        <a
+        <Link
           href="/dashboard/services/new"
-          className="inline-flex items-center gap-2 h-11 px-5 rounded-2xl font-bold text-sm text-white transition-all hover:shadow-lg"
           style={{
-            background: "linear-gradient(135deg, #0284C7, #0369A1)",
-            boxShadow: "0 2px 10px rgba(2,132,199,0.35)",
+            display: "flex", alignItems: "center", gap: 6,
+            height: 36, padding: "0 14px", borderRadius: 10,
+            background: "linear-gradient(135deg, var(--primary), #0369A1)",
+            color: "white", fontSize: 13, fontWeight: 700,
+            textDecoration: "none", boxShadow: "0 2px 8px rgba(2,132,199,0.30)",
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M6.5 1v11M1 6.5h11" stroke="white" strokeWidth="2" strokeLinecap="round"/>
           </svg>
-          Nuevo servicio
-        </a>
-      </div>
+          Nuevo
+        </Link>
+      </header>
 
-      <div className="px-6 lg:px-10 py-8 max-w-4xl">
+      <div style={{ flex: 1, padding: "20px 16px 100px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto", width: "100%" }}>
+
+        {/* Strip de stats */}
+        {serviceList.length > 0 && (
+          <div style={{
+            background: "var(--bg-white)", borderRadius: 14, border: "1px solid var(--border)",
+            padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: "rgba(2,132,199,0.10)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M2 4h14M2 9h9M2 14h6" stroke="var(--primary)" strokeWidth="1.6" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-dark)", letterSpacing: "-0.3px" }}>
+                  {serviceList.length} servicio{serviceList.length !== 1 ? "s" : ""} activo{serviceList.length !== 1 ? "s" : ""}
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}>
+                  Todos aparecen en tu página de reservas
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {serviceList.length === 0 ? (
-          <div
-            className="bg-white rounded-3xl py-20 text-center shadow-sm"
-            style={{ border: "1.5px solid var(--color-border)" }}
-          >
-            <div
-              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
-              style={{ background: "rgba(2,132,199,0.08)" }}
-            >
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0284C7" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          /* ── Empty state ── */
+          <div style={{
+            background: "var(--bg-white)", borderRadius: 20, border: "1px solid var(--border)",
+            display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+            padding: "52px 24px",
+          }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: 20, marginBottom: 20,
+              background: "rgba(2,132,199,0.08)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M6 8h20M6 14h13M6 20h9" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </div>
-            <p className="font-extrabold text-[var(--color-text-dark)] text-xl mb-2" style={{ letterSpacing: "-0.5px" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text-dark)", letterSpacing: "-0.4px", marginBottom: 8 }}>
               Todavía no tenés servicios
-            </p>
-            <p className="text-[var(--color-text-muted)] mb-8 max-w-xs mx-auto leading-relaxed">
+            </div>
+            <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, maxWidth: 260, marginBottom: 28 }}>
               Agregá tus servicios para que los clientes puedan hacer reservas online.
             </p>
-            <a
+            <Link
               href="/dashboard/services/new"
-              className="inline-flex items-center gap-2 h-12 px-8 rounded-2xl font-bold text-sm text-white transition-all hover:shadow-lg"
               style={{
-                background: "linear-gradient(135deg, #0284C7, #0369A1)",
-                boxShadow: "0 4px 16px rgba(2,132,199,0.35)",
+                display: "flex", alignItems: "center", gap: 8,
+                height: 46, padding: "0 24px", borderRadius: 13,
+                background: "linear-gradient(135deg, var(--primary), #0369A1)",
+                color: "white", fontSize: 14, fontWeight: 700,
+                textDecoration: "none", boxShadow: "0 4px 14px rgba(2,132,199,0.35)",
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
               </svg>
               Agregar mi primer servicio
-            </a>
+            </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {serviceList.map((service) => (
+          /* ── Lista de servicios ── */
+          serviceList.map((service, i) => {
+            const palette = PALETTE[i % PALETTE.length]!
+            return (
               <div
                 key={service.id}
-                className="bg-white rounded-3xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
-                style={{ border: "1.5px solid var(--color-border)" }}
+                style={{
+                  background: "var(--bg-white)", borderRadius: 16,
+                  border: "1px solid var(--border)", overflow: "hidden",
+                }}
               >
-                <div className="flex items-center gap-5 px-6 py-6">
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "16px" }}>
                   {/* Ícono */}
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ background: "rgba(2,132,199,0.08)" }}
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0284C7" strokeWidth="1.8">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <div style={{
+                    width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+                    background: palette.bg,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                      <path d="M3 5h16M3 10h10M3 15h7" stroke={palette.color} strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-extrabold text-[var(--color-text-dark)] text-base mb-0.5" style={{ letterSpacing: "-0.3px" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-dark)", letterSpacing: "-0.3px", marginBottom: 4 }}>
                       {service.name}
-                    </p>
+                    </div>
                     {service.description && (
-                      <p className="text-sm text-[var(--color-text-muted)] leading-snug line-clamp-1 mb-3">
+                      <div style={{
+                        fontSize: 13, color: "var(--text-muted)", lineHeight: 1.4,
+                        marginBottom: 8, overflow: "hidden",
+                        display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                      }}>
                         {service.description}
-                      </p>
+                      </div>
                     )}
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="text-xs font-bold px-3 py-1.5 rounded-full"
-                        style={{ background: "rgba(2,132,199,0.08)", color: "var(--color-primary)" }}
-                      >
-                        {formatDuration(service.durationMinutes)}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <span style={{
+                        fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
+                        background: palette.bg, color: palette.color,
+                      }}>
+                        ⏱ {formatDuration(service.durationMinutes)}
                       </span>
-                      {service.price && (
-                        <span className="text-base font-extrabold text-[var(--color-accent)]">
+                      {service.bufferMinutes > 0 && (
+                        <span style={{
+                          fontSize: 12, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
+                          background: "rgba(100,116,139,0.08)", color: "var(--text-muted)",
+                        }}>
+                          +{service.bufferMinutes} min pausa
+                        </span>
+                      )}
+                      {service.price && Number(service.price) > 0 && (
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "var(--accent)" }}>
                           ${Number(service.price).toLocaleString("es-AR")}
                         </span>
                       )}
                     </div>
                   </div>
+                </div>
 
-                  {/* Eliminar */}
+                {/* Footer de acciones */}
+                <div style={{
+                  borderTop: "1px solid var(--border)",
+                  background: "var(--bg)",
+                  padding: "10px 16px",
+                  display: "flex", justifyContent: "flex-end",
+                }}>
                   <form action={deleteService.bind(null, service.id)}>
                     <button
                       type="submit"
-                      className="h-10 px-4 rounded-xl text-xs font-bold transition-all hover:bg-red-50 hover:text-[var(--color-error)]"
-                      style={{ border: "1.5px solid var(--color-border)", color: "var(--color-text-muted)", background: "white" }}
+                      style={{
+                        height: 32, padding: "0 14px", borderRadius: 8,
+                        background: "transparent",
+                        border: "1px solid var(--border)",
+                        color: "var(--text-muted)", fontSize: 12, fontWeight: 700,
+                        cursor: "pointer", fontFamily: "inherit",
+                        transition: "all 150ms",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.background = "rgba(220,38,38,0.06)"
+                        ;(e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(220,38,38,0.25)"
+                        ;(e.currentTarget as HTMLButtonElement).style.color = "#DC2626"
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.background = "transparent"
+                        ;(e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"
+                        ;(e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"
+                      }}
                     >
                       Eliminar
                     </button>
                   </form>
                 </div>
               </div>
-            ))}
-          </div>
+            )
+          })
         )}
+
       </div>
+
+      {/* Bottom Nav */}
+      <nav className="bottom-nav">
+        <Link href="/dashboard" className="nav-item">
+          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="1" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/></svg>
+          Inicio
+        </Link>
+        <Link href="/dashboard/agenda" className="nav-item">
+          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="3" width="20" height="17" rx="3" stroke="currentColor" strokeWidth="1.6"/><path d="M6 1v4M16 1v4M1 10h20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+          Agenda
+        </Link>
+        <Link href="/dashboard/appointments/new" className="nav-item">
+          <svg viewBox="0 0 22 22" fill="none"><path d="M2 5h18M2 11h12M2 17h8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
+          Turnos
+        </Link>
+        <Link href="/dashboard/profile" className="nav-item active">
+          <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/><path d="M2 20c0-3.5 4-6 9-6s9 2.5 9 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+          Perfil
+        </Link>
+      </nav>
+
     </div>
   )
 }
