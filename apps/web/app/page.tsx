@@ -1,4 +1,5 @@
 import { BookziIcon } from "@/components/BookziLogo"
+import AuthHashRedirect from "@/components/AuthHashRedirect"
 
 const CATEGORIES = [
   { icon: "✂️",  label: "Peluquería" },
@@ -75,6 +76,7 @@ const FEATURES = [
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
+      <AuthHashRedirect />
 
       {/* ── Navbar ── */}
       <nav
