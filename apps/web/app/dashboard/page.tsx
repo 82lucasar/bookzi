@@ -23,6 +23,12 @@ export default async function DashboardPage() {
   const business = await getMyBusiness()
   if (!business) redirect("/onboarding/welcome")
 
+  const initials = business.name
+    .split(" ")
+    .slice(0, 2)
+    .map((w: string) => w[0]?.toUpperCase() ?? "")
+    .join("")
+
   const [todayAppts, upcomingAppts] = await Promise.all([
     getAppointments("today"),
     getAppointments("upcoming"),
@@ -61,7 +67,7 @@ export default async function DashboardPage() {
           </Link>
         </nav>
         <div className="sidebar-footer">
-          <div className="dash-avatar" style={{ width: 36, height: 36, fontSize: 14 }}>ML</div>
+          <div className="dash-avatar" style={{ width: 36, height: 36, fontSize: 14 }}>{initials}</div>
           <div>
             <div className="sidebar-profile-name">{business.name}</div>
             <div className="sidebar-profile-role">{business.category || "Profesional"}</div>
@@ -76,7 +82,7 @@ export default async function DashboardPage() {
             <div className="dash-logo-mark">B</div>
             <span className="dash-logo-text">Bookzi</span>
           </div>
-          <div className="dash-avatar">ML</div>
+          <div className="dash-avatar">{initials}</div>
         </header>
 
         <div className="content-area page-content-pad">
