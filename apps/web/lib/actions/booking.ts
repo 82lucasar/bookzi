@@ -182,16 +182,17 @@ export async function bookAppointment(formData: FormData) {
 
   if (paymentProofFile && paymentProofFile.size > 0) {
     try {
-      const supabase = await createClient()
+      const { createClient: createSupabaseClient } = await import("@supabase/supabase-js")
+      const adminClient = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      )
       const ext = paymentProofFile.name.split(".").pop() ?? "jpg"
       const fileName = `${businessId}/${Date.now()}.${ext}`
       const arrayBuffer = await paymentProofFile.arrayBuffer()
       const buffer = new Uint8Array(arrayBuffer)
 
-      // Crear bucket si no existe
-      await supabase.storage.createBucket("payment-proofs", { public: true }).catch(() => null)
-
-      const { data: uploadData, error: uploadError } = await supabase
+      const { data: uploadData, error: uploadError } = await adminClient
         .storage
         .from("payment-proofs")
         .upload(fileName, buffer, {
@@ -200,7 +201,7 @@ export async function bookAppointment(formData: FormData) {
         })
 
       if (!uploadError && uploadData) {
-        const { data: urlData } = supabase
+        const { data: urlData } = adminClient
           .storage
           .from("payment-proofs")
           .getPublicUrl(uploadData.path)
