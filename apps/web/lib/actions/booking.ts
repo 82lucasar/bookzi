@@ -5,6 +5,7 @@ import { db } from "@bookzi/db"
 import { businesses, services, staff, clients, appointments, availability } from "@bookzi/db/schema"
 import { eq, and, gte, lt, isNull, ne } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
+import { sendBookingReceivedToClient, sendNewBookingToProfessional } from "@/lib/email"
 
 const DAY_MAP: Record<number, string> = {
   0: "sunday", 1: "monday", 2: "tuesday", 3: "wednesday",
@@ -225,6 +226,30 @@ export async function bookAppointment(formData: FormData) {
     currencySnapshot: service.currency,
     paymentProofUrl,
   }).returning()
+
+  // Obtener email del negocio para notificación al profesional
+  const [biz] = await db
+    .select({ name: businesses.name, email: businesses.email })
+    .from(businesses)
+    .where(eq(businesses.id, businessId))
+    .limit(1)
+
+  const emailData = {
+    clientName,
+    clientEmail: clientEmail || null,
+    businessName: biz?.name ?? "",
+    businessEmail: biz?.email ?? null,
+    serviceName: service.name,
+    startAt: startAt.toISOString(),
+    endAt: endAt.toISOString(),
+    price: service.price,
+    currency: service.currency,
+  }
+
+  await Promise.allSettled([
+    sendBookingReceivedToClient(emailData),
+    sendNewBookingToProfessional(emailData),
+  ])
 
   redirect(`/book/confirmed?id=${inserted[0]?.id ?? ""}`)
 }

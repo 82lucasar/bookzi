@@ -5,6 +5,13 @@ import { db } from "@bookzi/db"
 import { appointments, services, clients, staff } from "@bookzi/db/schema"
 import { eq, and, gte, lt, desc, ne, isNull } from "drizzle-orm"
 import { getMyBusiness } from "./business"
+import {
+  sendAppointmentConfirmedToClient,
+  sendAppointmentCancelledToClient,
+  sendAppointmentCancelledToProfessional,
+  sendAppointmentRescheduledToClient,
+  sendAppointmentRescheduledToProfessional,
+} from "@/lib/email"
 
 export async function getAppointment(id: string) {
   const business = await getMyBusiness()
@@ -77,6 +84,8 @@ export async function rescheduleAppointment(
   const business = await getMyBusiness()
   if (!business) throw new Error("No se encontró el negocio")
 
+  const apptData = await getApptEmailData(id, business.id)
+
   const startAt = new Date(`${newDate}T${newTime}:00-03:00`)
   const endAt   = new Date(startAt.getTime() + durationMinutes * 60000)
 
@@ -91,6 +100,21 @@ export async function rescheduleAppointment(
   revalidatePath("/dashboard/appointments")
   revalidatePath("/dashboard/agenda")
   revalidatePath("/dashboard")
+
+  if (apptData) {
+    const emailBase = {
+      ...apptData,
+      businessName: business.name,
+      businessEmail: business.email ?? null,
+      oldStartAt: apptData.startAt,
+      startAt,
+      endAt,
+    }
+    await Promise.allSettled([
+      sendAppointmentRescheduledToClient(emailBase),
+      sendAppointmentRescheduledToProfessional(emailBase),
+    ])
+  }
 }
 
 export async function getAppointments(filter: "upcoming" | "today" | "past" = "upcoming") {
@@ -137,9 +161,30 @@ export async function getAppointments(filter: "upcoming" | "today" | "past" = "u
     .limit(50)
 }
 
+async function getApptEmailData(appointmentId: string, businessId: string) {
+  const [row] = await db
+    .select({
+      clientName: clients.name,
+      clientEmail: clients.email,
+      serviceName: services.name,
+      startAt: appointments.startAt,
+      endAt: appointments.endAt,
+      price: appointments.priceSnapshot,
+      currency: appointments.currencySnapshot,
+    })
+    .from(appointments)
+    .innerJoin(services, eq(appointments.serviceId, services.id))
+    .innerJoin(clients, eq(appointments.clientId, clients.id))
+    .where(and(eq(appointments.id, appointmentId), eq(appointments.businessId, businessId)))
+    .limit(1)
+  return row ?? null
+}
+
 export async function confirmAppointment(appointmentId: string) {
   const business = await getMyBusiness()
   if (!business) return
+
+  const apptData = await getApptEmailData(appointmentId, business.id)
 
   await db
     .update(appointments)
@@ -153,11 +198,21 @@ export async function confirmAppointment(appointmentId: string) {
   revalidatePath("/dashboard/appointments")
   revalidatePath("/dashboard/agenda")
   revalidatePath("/dashboard")
+
+  if (apptData) {
+    await sendAppointmentConfirmedToClient({
+      ...apptData,
+      businessName: business.name,
+      businessEmail: business.email ?? null,
+    })
+  }
 }
 
 export async function cancelAppointment(appointmentId: string) {
   const business = await getMyBusiness()
   if (!business) return
+
+  const apptData = await getApptEmailData(appointmentId, business.id)
 
   await db
     .update(appointments)
@@ -175,6 +230,18 @@ export async function cancelAppointment(appointmentId: string) {
   revalidatePath("/dashboard/appointments")
   revalidatePath("/dashboard/agenda")
   revalidatePath("/dashboard")
+
+  if (apptData) {
+    const emailBase = {
+      ...apptData,
+      businessName: business.name,
+      businessEmail: business.email ?? null,
+    }
+    await Promise.allSettled([
+      sendAppointmentCancelledToClient(emailBase),
+      sendAppointmentCancelledToProfessional(emailBase),
+    ])
+  }
 }
 
 export async function createDashboardAppointment(data: {
