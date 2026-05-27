@@ -1,7 +1,12 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = process.env.RESEND_FROM ?? "Bookzi <onboarding@resend.dev>"
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY!)
+}
+
+function getFrom() {
+  return process.env.RESEND_FROM ?? "Bookzi <onboarding@resend.dev>"
+}
 
 const TZ = "America/Argentina/Buenos_Aires"
 
@@ -153,8 +158,8 @@ export async function sendBookingReceivedToClient(appt: ApptData) {
     footer(),
   ].join(""))
 
-  await resend.emails.send({
-    from: FROM,
+  await getResend().emails.send({
+    from: getFrom(),
     to: appt.clientEmail,
     subject: `Reserva recibida en ${appt.businessName} — ${date}`,
     html,
@@ -185,8 +190,8 @@ export async function sendNewBookingToProfessional(appt: ApptData) {
     footer(),
   ].join(""))
 
-  await resend.emails.send({
-    from: FROM,
+  await getResend().emails.send({
+    from: getFrom(),
     to: appt.businessEmail,
     subject: `Nueva reserva de ${appt.clientName} — ${date}`,
     html,
@@ -220,8 +225,8 @@ export async function sendAppointmentConfirmedToClient(appt: ApptData) {
     footer(),
   ].join(""))
 
-  await resend.emails.send({
-    from: FROM,
+  await getResend().emails.send({
+    from: getFrom(),
     to: appt.clientEmail,
     subject: `Turno confirmado en ${appt.businessName} — ${date}`,
     html,
@@ -253,8 +258,8 @@ export async function sendAppointmentCancelledToClient(appt: ApptData) {
     footer(),
   ].join(""))
 
-  await resend.emails.send({
-    from: FROM,
+  await getResend().emails.send({
+    from: getFrom(),
     to: appt.clientEmail,
     subject: `Turno cancelado en ${appt.businessName} — ${date}`,
     html,
@@ -283,8 +288,8 @@ export async function sendAppointmentCancelledToProfessional(appt: ApptData) {
     footer(),
   ].join(""))
 
-  await resend.emails.send({
-    from: FROM,
+  await getResend().emails.send({
+    from: getFrom(),
     to: appt.businessEmail,
     subject: `Turno cancelado: ${appt.clientName} — ${date}`,
     html,
@@ -318,8 +323,8 @@ export async function sendAppointmentRescheduledToClient(appt: ApptData & { oldS
     footer(),
   ].join(""))
 
-  await resend.emails.send({
-    from: FROM,
+  await getResend().emails.send({
+    from: getFrom(),
     to: appt.clientEmail,
     subject: `Turno reprogramado en ${appt.businessName} — nuevo: ${newDate}`,
     html,
@@ -350,8 +355,8 @@ export async function sendAppointmentRescheduledToProfessional(appt: ApptData & 
     footer(),
   ].join(""))
 
-  await resend.emails.send({
-    from: FROM,
+  await getResend().emails.send({
+    from: getFrom(),
     to: appt.businessEmail,
     subject: `Reprogramaste turno de ${appt.clientName} — nuevo: ${newDate}`,
     html,
