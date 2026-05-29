@@ -121,8 +121,10 @@ export async function getAppointments(filter: "upcoming" | "today" | "past" = "u
   const business = await getMyBusiness()
   if (!business) return []
 
+  const AR_MS = 3 * 60 * 60 * 1000
   const now = new Date()
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const nowAR = new Date(now.getTime() - AR_MS)
+  const todayStart = new Date(Date.UTC(nowAR.getUTCFullYear(), nowAR.getUTCMonth(), nowAR.getUTCDate()) + AR_MS)
   const todayEnd = new Date(todayStart.getTime() + 86400000)
 
   const conditions = [

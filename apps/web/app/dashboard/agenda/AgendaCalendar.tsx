@@ -22,7 +22,7 @@ const DAY_CHIP_LABELS = ["L","M","X","J","V","S","D"]
 
 const HOUR_H = 64   // px por hora
 const START_H = 7   // 07:00
-const END_H   = 21  // 21:00
+const END_H   = 24  // 24:00
 const HOURS   = Array.from({ length: END_H - START_H }, (_, i) => i + START_H)
 
 const STATUS_COLOR: Record<string, { bg: string; border: string; text: string }> = {
@@ -330,7 +330,7 @@ export default function AgendaCalendar({ appointments }: { appointments: Appt[] 
                   {sameDay(selDay, today) && (() => {
                     const now = new Date()
                     const hd  = now.getHours() + now.getMinutes() / 60
-                    if (hd < START_H || hd > END_H) return null
+                    if (hd < START_H || hd >= END_H) return null
                     return (
                       <div style={{ position: "absolute", left: 0, right: 0, top: (hd - START_H) * HOUR_H, zIndex: 20, display: "flex", alignItems: "center" }}>
                         <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--error)", flexShrink: 0, marginLeft: -4 }} />
