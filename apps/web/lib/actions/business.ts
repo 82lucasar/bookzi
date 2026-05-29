@@ -25,9 +25,21 @@ export async function createBusiness(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
-  const name = formData.get("name") as string
+  const name     = formData.get("name") as string
   const category = formData.get("category") as string
-  const phone = formData.get("phone") as string
+  const phone    = formData.get("phone") as string
+
+  const defaultDuration = Number(formData.get("defaultDuration") ?? 30)
+  const bufferTime      = Number(formData.get("bufferTime") ?? 0)
+  const spacesRaw       = formData.get("spacesConfig") as string | null
+
+  let spacesConfig: { spaces: { name: string; capacity: number }[]; groupMode: boolean } = {
+    spaces: [{ name: "", capacity: 1 }],
+    groupMode: false,
+  }
+  if (spacesRaw) {
+    try { spacesConfig = JSON.parse(spacesRaw) } catch { /* keep default */ }
+  }
 
   const slug = name
     .toLowerCase()
@@ -44,6 +56,7 @@ export async function createBusiness(formData: FormData) {
     category: category || null,
     phone: phone || null,
     email: user.email ?? null,
+    config: { defaultDuration, bufferTime, ...spacesConfig },
   }).returning()
 
   const business = result[0]!

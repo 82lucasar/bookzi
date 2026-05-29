@@ -16,30 +16,47 @@ function addMin(base: string, mins: number) {
 
 const EX = "14:00"
 
+interface Space {
+  name: string
+  capacity: number
+}
+
 export default function SetupDurationPicker() {
   const [duration, setDuration] = useState(30)
   const [buffer, setBuffer]     = useState(0)
-  const [slots, setSlots]       = useState(1)
-  const [names, setNames]       = useState<string[]>([""])
+  const [spaces, setSpaces]     = useState<Space[]>([{ name: "", capacity: 1 }])
+  const [groupMode, setGroupMode] = useState(false)
 
-  const changeSlots = (n: number) => {
+  const spaceCount       = spaces.length
+  const hasMultiCapacity = spaces.some(s => s.capacity > 1)
+
+  const changeSpaceCount = (n: number) => {
     const count = Math.max(1, Math.min(10, n))
-    setSlots(count)
-    setNames(prev => {
+    setSpaces(prev => {
       const next = [...prev]
-      while (next.length < count) next.push("")
+      while (next.length < count) next.push({ name: "", capacity: 1 })
       return next.slice(0, count)
+    })
+  }
+
+  const updateSpace = (i: number, field: keyof Space, value: string | number) => {
+    setSpaces(prev => {
+      const next = [...prev]
+      next[i] = { ...next[i]!, [field]: value }
+      return next
     })
   }
 
   const endTime  = addMin(EX, duration)
   const nextTime = addMin(EX, duration + buffer)
 
-  const stepper = (val: number, dec: () => void, inc: () => void, label: string) => (
+  const spacesConfig = JSON.stringify({ spaces, groupMode })
+
+  const stepper = (dec: () => void, label: string, inc: () => void) => (
     <div style={{
       display: "flex", alignItems: "center",
       background: "var(--bg-white)", border: "1px solid var(--border)",
-      borderRadius: "var(--radius-sm)", overflow: "hidden"
+      borderRadius: "var(--radius-sm)", overflow: "hidden",
     }}>
       <button type="button" onClick={dec} style={btnSt}>−</button>
       <span style={{ flex: 1, textAlign: "center", fontSize: 15, fontWeight: 700, color: "var(--text-dark)" }}>
@@ -54,9 +71,8 @@ export default function SetupDurationPicker() {
 
       {/* hidden fields */}
       <input type="hidden" name="defaultDuration" value={duration} />
-      <input type="hidden" name="bufferTime"       value={buffer} />
-      <input type="hidden" name="concurrentSlots"  value={slots} />
-      {names.map((n, i) => <input key={i} type="hidden" name={`slotName_${i}`} value={n} />)}
+      <input type="hidden" name="bufferTime"      value={buffer} />
+      <input type="hidden" name="spacesConfig"    value={spacesConfig} />
 
       {/* ── Duración ── */}
       <div className="form-group">
@@ -82,10 +98,9 @@ export default function SetupDurationPicker() {
       <div className="form-group">
         <label className="form-label">¿Tiempo libre entre turnos?</label>
         {stepper(
-          buffer,
           () => setBuffer(b => Math.max(0, b - 5)),
+          buffer === 0 ? "Sin intervalo" : `${buffer} min`,
           () => setBuffer(b => b + 5),
-          buffer === 0 ? "Sin intervalo" : `${buffer} min`
         )}
         {buffer > 0 ? (
           <div style={infoBx}>
@@ -102,50 +117,100 @@ export default function SetupDurationPicker() {
         )}
       </div>
 
-      {/* ── Reservas simultáneas ── */}
+      {/* ── Espacios ── */}
       <div className="form-group">
-        <label className="form-label">¿Cuántas reservas en el mismo horario?</label>
+        <label className="form-label">¿Cuántos espacios tenés disponibles?</label>
         {stepper(
-          slots,
-          () => changeSlots(slots - 1),
-          () => changeSlots(slots + 1),
-          `${slots} ${slots === 1 ? "lugar" : "lugares"}`
+          () => changeSpaceCount(spaceCount - 1),
+          `${spaceCount} ${spaceCount === 1 ? "espacio" : "espacios"}`,
+          () => changeSpaceCount(spaceCount + 1),
         )}
         <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 8 }}>
-          {slots === 1
-            ? "Solo una reserva por horario."
-            : `Las ${slots} reservas del mismo horario se asignan a distintos espacios.`}
+          {spaceCount === 1
+            ? "Un solo espacio — cada turno ocupa toda la disponibilidad."
+            : `${spaceCount} espacios independientes. Cada uno puede recibir turnos en el mismo horario.`}
         </p>
 
-        {slots > 1 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-mid)" }}>
-              Nombrá cada espacio <span style={{ fontWeight: 400, color: "var(--text-muted)" }}>(opcional)</span>
-            </div>
-            {names.map((name, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {/* Configuración de cada espacio */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+          {spaces.map((space, i) => (
+            <div key={i} style={{
+              background: "#F8FAFC",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius-sm)",
+              padding: "14px 16px",
+              display: "flex", flexDirection: "column", gap: 10,
+            }}>
+              {/* número + nombre */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{
                   width: 30, height: 30, borderRadius: 8, flexShrink: 0,
                   background: "var(--primary)", color: "#fff",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, fontWeight: 700
+                  fontSize: 13, fontWeight: 700,
                 }}>
                   {i + 1}
                 </div>
                 <input
                   className="form-input"
                   type="text"
-                  placeholder={`Ej: Consultorio ${i + 1}`}
-                  value={name}
-                  onChange={e => {
-                    const next = [...names]
-                    next[i] = e.target.value
-                    setNames(next)
-                  }}
+                  placeholder={`Espacio ${i + 1} (ej: Consultorio ${i + 1})`}
+                  value={space.name}
+                  onChange={e => updateSpace(i, "name", e.target.value)}
                   style={{ margin: 0, flex: 1 }}
                 />
               </div>
-            ))}
+
+              {/* capacidad */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 13, color: "var(--text-mid)", flex: 1 }}>
+                  Capacidad por turno
+                </span>
+                <div style={{
+                  display: "flex", alignItems: "center",
+                  background: "#fff", border: "1px solid var(--border)",
+                  borderRadius: "var(--radius-sm)", overflow: "hidden",
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => updateSpace(i, "capacity", Math.max(1, space.capacity - 1))}
+                    style={{ ...btnSt, width: 36, height: 36, fontSize: 18 }}
+                  >−</button>
+                  <span style={{ width: 44, textAlign: "center", fontSize: 14, fontWeight: 700, color: "var(--text-dark)" }}>
+                    {space.capacity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => updateSpace(i, "capacity", Math.min(50, space.capacity + 1))}
+                    style={{ ...btnSt, width: 36, height: 36, fontSize: 18 }}
+                  >+</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Modo grupo — solo visible si algún espacio tiene capacidad > 1 */}
+        {hasMultiCapacity && (
+          <div style={{
+            marginTop: 14,
+            background: "rgba(2,132,199,0.07)",
+            border: "1px solid rgba(2,132,199,0.18)",
+            borderRadius: "var(--radius-sm)",
+            padding: "14px 16px",
+            display: "flex", alignItems: "flex-start", gap: 12,
+          }}>
+            <input
+              type="checkbox"
+              id="groupMode"
+              checked={groupMode}
+              onChange={e => setGroupMode(e.target.checked)}
+              style={{ marginTop: 2, width: 16, height: 16, accentColor: "#0284C7", flexShrink: 0 }}
+            />
+            <label htmlFor="groupMode" style={{ fontSize: 13, color: "var(--text-mid)", lineHeight: 1.6, cursor: "pointer" }}>
+              <strong style={{ color: "var(--text-dark)" }}>Modo grupo</strong> — Los clientes reservan individualmente
+              pero comparten el mismo espacio. Ideal para clases grupales, workshops o actividades colectivas.
+            </label>
           </div>
         )}
       </div>

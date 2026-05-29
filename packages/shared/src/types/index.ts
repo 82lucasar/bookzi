@@ -34,6 +34,20 @@ export type DayOfWeek =
   | "saturday"
   | "sunday"
 
+// ── Business Setup ────────────────────────────────────────────────────────────
+
+export interface BusinessSpace {
+  name: string
+  capacity: number
+}
+
+export interface BusinessSetupConfig {
+  defaultDuration: number
+  bufferTime: number
+  spaces: BusinessSpace[]
+  groupMode: boolean
+}
+
 // ── Shared DTOs ───────────────────────────────────────────────────────────────
 
 export interface BusinessConfig {
