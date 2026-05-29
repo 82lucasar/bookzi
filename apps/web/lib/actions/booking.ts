@@ -1,6 +1,5 @@
 "use server"
 
-import { redirect } from "next/navigation"
 import { db } from "@bookzi/db"
 import { businesses, services, staff, clients, appointments, availability } from "@bookzi/db/schema"
 import { eq, and, gte, lt, isNull, ne } from "drizzle-orm"
@@ -251,7 +250,7 @@ export async function bookAppointment(formData: FormData) {
     sendNewBookingToProfessional(emailData),
   ])
 
-  redirect(`/book/confirmed?id=${inserted[0]?.id ?? ""}`)
+  return inserted[0]?.id ?? ""
 }
 
 export async function getAppointmentPublic(id: string) {

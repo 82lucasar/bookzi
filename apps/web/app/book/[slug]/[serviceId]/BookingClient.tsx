@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition, useRef, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { getAvailableSlots, bookAppointment } from "@/lib/actions/booking"
 import { BookziIcon } from "@/components/BookziLogo"
 
@@ -171,6 +172,7 @@ export default function BookingClient({ business, service }: { business: Busines
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   const cells = buildCalendar(year, month)
 
@@ -226,7 +228,10 @@ export default function BookingClient({ business, service }: { business: Busines
     fd.append("clientEmail", clientEmail)
     fd.append("notes", clientNotes)
     if (proofFile) fd.append("paymentProof", proofFile)
-    startTransition(() => bookAppointment(fd))
+    startTransition(async () => {
+      const id = await bookAppointment(fd)
+      router.push(`/book/confirmed?id=${id}`)
+    })
   }
 
   const canGoToDatos = !!selectedDate && !!selectedSlot
