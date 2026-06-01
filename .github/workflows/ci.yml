@@ -1,10 +1,7 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:  # solo manual hasta resolver compatibilidad pnpm v11 en Ubuntu CI
 
 jobs:
   typecheck:
