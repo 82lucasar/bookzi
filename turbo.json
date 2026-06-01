@@ -12,7 +12,13 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "SUPABASE_URL",
         "SUPABASE_ANON_KEY",
-        "SUPABASE_SERVICE_ROLE_KEY"
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "RESEND_API_KEY",
+        "RESEND_FROM",
+        "MP_ACCESS_TOKEN",
+        "MP_PLAN_PRO_ID",
+        "MP_PLAN_BUSINESS_ID",
+        "CRON_SECRET"
       ]
     },
     "dev": {
