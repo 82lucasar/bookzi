@@ -1,0 +1,41 @@
+{
+  "swarmId": "swarm-mpqx2p8z",
+  "objective": "Avanzar el proyecto Bookzi en paralelo con 3 agentes especializados: (1) bookzi-frontend construye la landing page pública de marketing en apps/web/app/\\(marketing\\)/page.tsx con la paleta de colores de Bookzi (--primary #0284C7, --accent #059669, --bg #F0F9FF) y voseo rioplatense, hero section, features, CTA hacia /register, mobile-first, inline styles sin Tailwind arbitrario. (2) bookzi-qa escribe tests de integración para el flujo de reserva pública en apps/web/__tests__/booking.test.ts usando Vitest, cubriendo bookAppointment action, slots disponibles y edge cases de solapamiento. (3) bookzi-docs genera documentación técnica de los server actions en docs/api/actions.md con tipos, parámetros y ejemplos de uso.",
+  "strategy": "development",
+  "status": "initialized",
+  "agents": 8,
+  "agentPlan": [
+    {
+      "role": "Coordinator",
+      "type": "coordinator",
+      "count": 1,
+      "purpose": "Orchestrate workflow"
+    },
+    {
+      "role": "Architect",
+      "type": "architect",
+      "count": 1,
+      "purpose": "System design"
+    },
+    {
+      "role": "Coder",
+      "type": "coder",
+      "count": 3,
+      "purpose": "Implementation"
+    },
+    {
+      "role": "Tester",
+      "type": "tester",
+      "count": 2,
+      "purpose": "Quality assurance"
+    },
+    {
+      "role": "Reviewer",
+      "type": "reviewer",
+      "count": 1,
+      "purpose": "Code review"
+    }
+  ],
+  "startedAt": "2026-05-29T12:47:22.451Z",
+  "parallel": true
+}

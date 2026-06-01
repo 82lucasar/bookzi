@@ -435,3 +435,48 @@ export async function sendReminder2h(appt: ReminderData) {
     html,
   })
 }
+
+// ─── 10. Recordatorio de trial → negocio ─────────────────────────────────────
+
+export async function sendTrialReminder(data: {
+  businessEmail: string
+  businessName: string
+  daysLeft: number
+  billingUrl: string
+}) {
+  if (!process.env.RESEND_API_KEY) return
+  const isLastDay = data.daysLeft <= 1
+  const subject = isLastDay
+    ? `⚠️ Tu prueba gratis vence mañana — ${data.businessName}`
+    : `Tu prueba gratis de Bookzi vence en ${data.daysLeft} días`
+
+  const html = wrap([
+    header(),
+    badge(
+      isLastDay ? "⚠️ Último día de prueba" : `🗓 ${data.daysLeft} días restantes`,
+      isLastDay ? "#FEE2E2" : "#EFF6FF",
+      isLastDay ? "#991B1B" : "#1E40AF",
+    ),
+    titleRow(
+      isLastDay ? "¡Tu prueba vence mañana!" : `Tu prueba vence en ${data.daysLeft} días`,
+      `Hola equipo de <strong>${data.businessName}</strong>, tu período de prueba gratis de Bookzi está por terminar.`,
+    ),
+    infoBox(
+      `Activá tu plan Pro (ARS 12.900/mes) para seguir recibiendo turnos, recordatorios automáticos y todas las funciones sin interrupciones.`,
+      "#1E40AF", "#EFF6FF", "#0284C7",
+    ),
+    `<tr><td style="padding:24px 40px;">
+      <a href="${data.billingUrl}" style="display:block;text-align:center;background:linear-gradient(135deg,#0284C7,#0369A1);color:white;font-weight:800;font-size:15px;padding:16px 32px;border-radius:12px;text-decoration:none;">
+        Activar mi plan ahora →
+      </a>
+    </td></tr>`,
+    footer(),
+  ].join(""))
+
+  await getResend().emails.send({
+    from: getFrom(),
+    to: data.businessEmail,
+    subject,
+    html,
+  })
+}

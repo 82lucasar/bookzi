@@ -4,7 +4,7 @@ import { z } from "zod"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { db } from "@bookzi/db"
-import { businesses, staff } from "@bookzi/db/schema"
+import { businesses, staff, subscriptions } from "@bookzi/db/schema"
 import { eq } from "drizzle-orm"
 
 const CreateBusinessSchema = z.object({
@@ -115,6 +115,17 @@ export async function createBusiness(formData: FormData) {
     name,
     email: user.email ?? null,
     phone: phone || null,
+  })
+
+  // Asignar free trial de 14 días
+  const trialEndsAt = new Date()
+  trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+
+  await db.insert(subscriptions).values({
+    businessId: business.id,
+    plan: "pro",
+    status: "active",
+    trialEndsAt,
   })
 
   redirect("/onboarding/services")
