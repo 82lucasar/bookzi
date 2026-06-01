@@ -40,52 +40,16 @@ export default async function DashboardPage() {
   const nextAppt = todayAppts.find(a => a.status === "confirmed")
 
   return (
-    <div className="page-wrap">
-
-      {/* Sidebar (desktop) */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <div className="sidebar-logo-mark">B</div>
-          <span className="sidebar-logo-text">Bookzi</span>
+    <>
+      <header className="dash-header">
+        <div className="dash-logo">
+          <div className="dash-logo-mark">B</div>
+          <span className="dash-logo-text">Bookzi</span>
         </div>
-        <nav className="sidebar-nav">
-          <Link href="/dashboard" className="sidebar-link active">
-            <svg viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="6.5" height="6.5" rx="2" fill="currentColor"/><rect x="10.5" y="1" width="6.5" height="6.5" rx="2" fill="currentColor" opacity=".5"/><rect x="1" y="10.5" width="6.5" height="6.5" rx="2" fill="currentColor" opacity=".5"/><rect x="10.5" y="10.5" width="6.5" height="6.5" rx="2" fill="currentColor" opacity=".5"/></svg>
-            Inicio
-          </Link>
-          <Link href="/dashboard/agenda" className="sidebar-link">
-            <svg viewBox="0 0 18 18" fill="none"><rect x="1" y="3" width="16" height="13" rx="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 1v3M13 1v3M1 8h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            Agenda
-          </Link>
-          <Link href="/dashboard/appointments/new" className="sidebar-link">
-            <svg viewBox="0 0 18 18" fill="none"><path d="M2 4h14M2 9h9M2 14h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            Turnos
-          </Link>
-          <Link href="/dashboard/profile" className="sidebar-link">
-            <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="4" stroke="currentColor" strokeWidth="1.5"/><path d="M1.5 16c0-3 3.4-5.5 7.5-5.5s7.5 2.5 7.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            Perfil
-          </Link>
-        </nav>
-        <div className="sidebar-footer">
-          <div className="dash-avatar" style={{ width: 36, height: 36, fontSize: 14 }}>{initials}</div>
-          <div>
-            <div className="sidebar-profile-name">{business.name}</div>
-            <div className="sidebar-profile-role">{business.category || "Profesional"}</div>
-          </div>
-        </div>
-      </aside>
+        <div className="dash-avatar">{initials}</div>
+      </header>
 
-      {/* Main */}
-      <div className="main-wrap">
-        <header className="dash-header">
-          <div className="dash-logo">
-            <div className="dash-logo-mark">B</div>
-            <span className="dash-logo-text">Bookzi</span>
-          </div>
-          <div className="dash-avatar">{initials}</div>
-        </header>
-
-        <div className="content-area page-content-pad">
+      <div className="content-area page-content-pad">
 
           {/* Hero */}
           <div className="hero-strip" style={{ margin: "16px 16px 0" }}>
@@ -213,7 +177,6 @@ export default async function DashboardPage() {
           </div>
 
         </div>
-      </div>
 
       {/* FAB */}
       <Link href="/dashboard/appointments/new">
@@ -221,27 +184,6 @@ export default async function DashboardPage() {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.2" strokeLinecap="round"/></svg>
         </button>
       </Link>
-
-      {/* Bottom Nav */}
-      <nav className="bottom-nav">
-        <Link href="/dashboard" className="nav-item active">
-          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="1" width="8" height="8" rx="2.5" fill="currentColor"/><rect x="13" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="1" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/></svg>
-          Inicio
-        </Link>
-        <Link href="/dashboard/agenda" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="3" width="20" height="17" rx="3" stroke="currentColor" strokeWidth="1.6"/><path d="M6 1v4M16 1v4M1 10h20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-          Agenda
-        </Link>
-        <Link href="/dashboard/appointments/new" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><path d="M2 5h18M2 11h12M2 17h8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
-          Turnos
-        </Link>
-        <Link href="/dashboard/profile" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/><path d="M2 20c0-3.5 4-6 9-6s9 2.5 9 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-          Perfil
-        </Link>
-      </nav>
-
-    </div>
+    </>
   )
 }

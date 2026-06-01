@@ -1,11 +1,27 @@
 "use server"
 
+import { z } from "zod"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { db } from "@bookzi/db"
 import { services } from "@bookzi/db/schema"
 import { eq, and, isNull } from "drizzle-orm"
 import { getMyBusiness } from "./business"
+
+const CreateServiceSchema = z.object({
+  name: z.string().min(1, "El nombre es obligatorio").max(255),
+  durationMinutes: z.coerce.number().int().min(5).max(480),
+  bufferMinutes: z.coerce.number().int().min(0).max(120).default(0),
+  price: z.string().max(20).optional(),
+})
+
+const OnboardingServiceSchema = z.object({
+  name: z.string().min(1).max(255),
+  durationMinutes: z.number().int().min(5).max(480),
+  price: z.string().max(20).optional().nullable(),
+  maxPerDay: z.number().int().positive().nullable().optional(),
+})
+const OnboardingServicesSchema = z.array(OnboardingServiceSchema).min(0)
 
 export async function getServices() {
   const business = await getMyBusiness()
@@ -26,19 +42,22 @@ export async function createService(formData: FormData) {
   const business = await getMyBusiness()
   if (!business) redirect("/dashboard/setup")
 
-  const name = formData.get("name") as string
+  const parsed = CreateServiceSchema.parse({
+    name: formData.get("name"),
+    durationMinutes: formData.get("durationMinutes"),
+    bufferMinutes: formData.get("bufferMinutes"),
+    price: formData.get("price"),
+  })
+
   const description = formData.get("description") as string
-  const durationMinutes = parseInt(formData.get("durationMinutes") as string)
-  const bufferMinutes = parseInt(formData.get("bufferMinutes") as string) || 0
-  const price = formData.get("price") as string
 
   await db.insert(services).values({
     businessId: business.id,
-    name,
+    name: parsed.name,
     description: description || null,
-    durationMinutes,
-    bufferMinutes,
-    price: price ? price : null,
+    durationMinutes: parsed.durationMinutes,
+    bufferMinutes: parsed.bufferMinutes,
+    price: parsed.price ? parsed.price : null,
     currency: "ARS",
   })
 
@@ -52,7 +71,9 @@ export async function saveOnboardingServices(
   const business = await getMyBusiness()
   if (!business) redirect("/dashboard/setup")
 
-  const inserts = servicesData
+  const parsed = OnboardingServicesSchema.parse(servicesData)
+
+  const inserts = parsed
     .filter(s => s.name.trim().length > 0)
     .map(s => ({
       businessId: business.id,

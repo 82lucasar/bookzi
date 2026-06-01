@@ -1,10 +1,22 @@
 "use server"
 
+import { z } from "zod"
 import { db } from "@bookzi/db"
 import { businesses, services, staff, clients, appointments, availability } from "@bookzi/db/schema"
 import { eq, and, gte, lt, isNull, ne } from "drizzle-orm"
 import { createClient } from "@/lib/supabase/server"
 import { sendBookingReceivedToClient, sendNewBookingToProfessional } from "@/lib/email"
+
+const BookAppointmentSchema = z.object({
+  businessId: z.string().uuid(),
+  serviceId: z.string().uuid(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z.string().regex(/^\d{2}:\d{2}$/),
+  clientName: z.string().min(1).max(255),
+  clientPhone: z.string().min(6).max(30),
+  clientEmail: z.string().email().optional().or(z.literal("")).or(z.literal(null)),
+  notes: z.string().max(1000).optional().nullable(),
+})
 
 const DAY_MAP: Record<number, string> = {
   0: "sunday", 1: "monday", 2: "tuesday", 3: "wednesday",
@@ -121,13 +133,21 @@ export async function getAvailableSlots(
 }
 
 export async function bookAppointment(formData: FormData) {
-  const businessId = formData.get("businessId") as string
-  const serviceId = formData.get("serviceId") as string
-  const dateStr = formData.get("date") as string
-  const timeStr = formData.get("time") as string
-  const clientName = formData.get("clientName") as string
-  const clientPhone = formData.get("clientPhone") as string
-  const clientEmail = formData.get("clientEmail") as string
+  const parsed = BookAppointmentSchema.parse({
+    businessId: formData.get("businessId"),
+    serviceId: formData.get("serviceId"),
+    date: formData.get("date"),
+    time: formData.get("time"),
+    clientName: formData.get("clientName"),
+    clientPhone: formData.get("clientPhone"),
+    clientEmail: formData.get("clientEmail"),
+    notes: formData.get("notes"),
+  })
+
+  const { businessId, serviceId, clientName, clientPhone, clientEmail } = parsed
+  const dateStr = parsed.date
+  const timeStr = parsed.time
+  const clientNotes = parsed.notes ?? null
   const paymentProofFile = formData.get("paymentProof") as File | null
 
   // Obtener servicio para calcular endAt
@@ -221,6 +241,7 @@ export async function bookAppointment(formData: FormData) {
     startAt,
     endAt,
     status: "pending",
+    notes: clientNotes?.trim() || null,
     priceSnapshot: service.price,
     currencySnapshot: service.currency,
     paymentProofUrl,

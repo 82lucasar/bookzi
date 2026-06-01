@@ -88,12 +88,26 @@ export default async function ProfilePage() {
             </div>
           </Link>
           <Link href="/dashboard/services" style={{ textDecoration: "none" }}>
-            <div style={{ padding: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+            <div style={{ padding: "16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(2,132,199,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5h14M2 10h9M2 15h7" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 </div>
                 <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text-dark)" }}>Servicios</span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="var(--text-muted)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+          </Link>
+          <Link href="/dashboard/billing" style={{ textDecoration: "none" }}>
+            <div style={{ padding: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(5,150,105,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="4" width="16" height="11" rx="2" stroke="var(--accent)" strokeWidth="1.5"/><path d="M1 8h16" stroke="var(--accent)" strokeWidth="1.5"/><circle cx="5" cy="12" r="1" fill="var(--accent)"/></svg>
+                </div>
+                <div>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text-dark)" }}>Mi plan</span>
+                  <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>Suscripción y facturación</p>
+                </div>
               </div>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="var(--text-muted)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
@@ -105,25 +119,6 @@ export default async function ProfilePage() {
 
       </div>
 
-      {/* Bottom Nav */}
-      <nav className="bottom-nav">
-        <Link href="/dashboard" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="1" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/></svg>
-          Inicio
-        </Link>
-        <Link href="/dashboard/agenda" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="3" width="20" height="17" rx="3" stroke="currentColor" strokeWidth="1.6"/><path d="M6 1v4M16 1v4M1 10h20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-          Agenda
-        </Link>
-        <Link href="/dashboard/appointments/new" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><path d="M2 5h18M2 11h12M2 17h8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
-          Turnos
-        </Link>
-        <Link href="/dashboard/profile" className="nav-item active">
-          <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/><path d="M2 20c0-3.5 4-6 9-6s9 2.5 9 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-          Perfil
-        </Link>
-      </nav>
 
     </div>
   )

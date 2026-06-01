@@ -71,10 +71,10 @@ export default function AvailabilityOnboardingForm({ services }: Props) {
   const handleSave = async () => {
     setLoading(true)
     await saveAvailability(buildDayConfigs())
-    router.push("/onboarding/done")
+    router.push("/onboarding/payment-method")
   }
 
-  const handleSkip = () => router.push("/onboarding/done")
+  const handleSkip = () => router.push("/onboarding/payment-method")
 
   return (
     <div className="ob-screen">
@@ -89,14 +89,14 @@ export default function AvailabilityOnboardingForm({ services }: Props) {
               <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <span className="step-label">Paso 3 de 3</span>
+          <span className="step-label">Paso 3 de 4</span>
         </div>
         <a href="/dashboard" className="logo-home-btn">B</a>
       </div>
 
       <div className="progress-wrap">
         <div className="progress-bar">
-          <div className="progress-fill" style={{ width: "100%" }}></div>
+          <div className="progress-fill" style={{ width: "75%" }}></div>
         </div>
       </div>
 
@@ -215,7 +215,7 @@ export default function AvailabilityOnboardingForm({ services }: Props) {
           style={{ opacity: loading ? 0.8 : 1, cursor: loading ? "not-allowed" : "pointer" }}
           onClick={handleSave}
         >
-          {loading ? "Guardando..." : "¡Listo! Ver mi agenda"}
+          {loading ? "Guardando..." : "Siguiente →"}
         </button>
         <button
           className="btn btn-secondary btn-full"

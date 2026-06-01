@@ -362,3 +362,76 @@ export async function sendAppointmentRescheduledToProfessional(appt: ApptData & 
     html,
   })
 }
+
+// ─── Reminder data type ───────────────────────────────────────────────────────
+
+type ReminderData = {
+  clientName: string
+  clientEmail: string | null
+  businessName: string
+  serviceName: string
+  startAt: Date | string
+  endAt: Date | string
+}
+
+// ─── 8. Recordatorio 24h → cliente ───────────────────────────────────────────
+
+export async function sendReminder24h(appt: ReminderData) {
+  if (!process.env.RESEND_API_KEY || !appt.clientEmail) return
+  const date = fmtDate(appt.startAt)
+  const timeRange = `${fmtTime(appt.startAt)} — ${fmtTime(appt.endAt)} hs`
+
+  const html = wrap([
+    header(),
+    badge("🔔 Recordatorio — 24 hs", "#EFF6FF", "#1E40AF"),
+    titleRow(
+      "Tu turno es mañana",
+      `Hola <strong>${appt.clientName}</strong>, te recordamos que tenés un turno mañana en <strong>${appt.businessName}</strong>.`,
+    ),
+    detailBox([
+      detailRow("Servicio", appt.serviceName),
+      detailRow("Fecha y hora", date, timeRange),
+    ].join("")),
+    infoBox(
+      `Si necesitás cancelar o reprogramar, comunicate lo antes posible con <strong>${appt.businessName}</strong>.`,
+      "#1E40AF", "#EFF6FF", "#0284C7",
+    ),
+    footer(),
+  ].join(""))
+
+  await getResend().emails.send({
+    from: getFrom(),
+    to: appt.clientEmail,
+    subject: `Recordatorio: tu turno mañana en ${appt.businessName}`,
+    html,
+  })
+}
+
+// ─── 9. Recordatorio 2h → cliente ────────────────────────────────────────────
+
+export async function sendReminder2h(appt: ReminderData) {
+  if (!process.env.RESEND_API_KEY || !appt.clientEmail) return
+  const date = fmtDate(appt.startAt)
+  const timeRange = `${fmtTime(appt.startAt)} — ${fmtTime(appt.endAt)} hs`
+
+  const html = wrap([
+    header(),
+    badge("⏰ En 2 horas", "#FEF3C7", "#92400E"),
+    titleRow(
+      "¡Tu turno es muy pronto!",
+      `Hola <strong>${appt.clientName}</strong>, en 2 horas tenés turno en <strong>${appt.businessName}</strong>. ¡Acordate!`,
+    ),
+    detailBox([
+      detailRow("Servicio", appt.serviceName),
+      detailRow("Fecha y hora", date, timeRange),
+    ].join("")),
+    footer(),
+  ].join(""))
+
+  await getResend().emails.send({
+    from: getFrom(),
+    to: appt.clientEmail,
+    subject: `Tu turno es en 2 horas — ${appt.businessName}`,
+    html,
+  })
+}

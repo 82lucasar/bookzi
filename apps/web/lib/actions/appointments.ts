@@ -1,5 +1,6 @@
 "use server"
 
+import { z } from "zod"
 import { revalidatePath } from "next/cache"
 import { db } from "@bookzi/db"
 import { appointments, services, clients, staff } from "@bookzi/db/schema"
@@ -12,6 +13,15 @@ import {
   sendAppointmentRescheduledToClient,
   sendAppointmentRescheduledToProfessional,
 } from "@/lib/email"
+
+const CreateApptSchema = z.object({
+  clientName: z.string().min(1, "El nombre es obligatorio").max(255),
+  clientPhone: z.string().min(6, "El teléfono es obligatorio").max(30),
+  clientEmail: z.string().email("Email inválido").optional().or(z.literal("")),
+  serviceId: z.string().uuid("ID de servicio inválido"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida (YYYY-MM-DD)"),
+  time: z.string().regex(/^\d{2}:\d{2}$/, "Hora inválida (HH:MM)"),
+})
 
 export async function getAppointment(id: string) {
   const business = await getMyBusiness()
@@ -254,12 +264,17 @@ export async function createDashboardAppointment(data: {
   date: string
   time: string
 }): Promise<string> {
+  const parsed = CreateApptSchema.parse(data)
+
   const business = await getMyBusiness()
   if (!business) throw new Error("No se encontró el negocio")
 
   const [service] = await db.select().from(services)
-    .where(eq(services.id, data.serviceId)).limit(1)
-  if (!service) throw new Error("Servicio no encontrado")
+    .where(and(
+      eq(services.id, parsed.serviceId),
+      eq(services.businessId, business.id),
+    )).limit(1)
+  if (!service) throw new Error("Servicio no encontrado o no pertenece a este negocio")
 
   const staffRows = await db.select().from(staff)
     .where(and(eq(staff.businessId, business.id), isNull(staff.deletedAt)))
@@ -273,28 +288,28 @@ export async function createDashboardAppointment(data: {
     defaultStaff = created!
   }
 
-  const startAt = new Date(`${data.date}T${data.time}:00-03:00`)
+  const startAt = new Date(`${parsed.date}T${parsed.time}:00-03:00`)
   const endAt = new Date(startAt.getTime() + service.durationMinutes * 60000)
 
   let [client] = await db.select().from(clients)
     .where(and(
       eq(clients.businessId, business.id),
-      eq(clients.phone, data.clientPhone),
+      eq(clients.phone, parsed.clientPhone),
     )).limit(1)
 
   if (!client) {
     const [inserted] = await db.insert(clients).values({
       businessId: business.id,
-      name: data.clientName,
-      phone: data.clientPhone,
-      email: data.clientEmail || null,
+      name: parsed.clientName,
+      phone: parsed.clientPhone,
+      email: parsed.clientEmail || null,
     }).returning()
     client = inserted!
   }
 
   const [inserted] = await db.insert(appointments).values({
     businessId: business.id,
-    serviceId: data.serviceId,
+    serviceId: parsed.serviceId,
     staffId: defaultStaff.id,
     clientId: client.id,
     startAt,

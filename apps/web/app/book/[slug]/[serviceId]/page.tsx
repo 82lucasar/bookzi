@@ -67,6 +67,9 @@ export default async function BookServicePage({
             id: business.id,
             name: business.name,
             slug: business.slug,
+            transferTitular: business.transferTitular ?? null,
+            transferCbu: business.transferCbu ?? null,
+            transferAlias: business.transferAlias ?? null,
           }}
           service={{
             id: service.id,

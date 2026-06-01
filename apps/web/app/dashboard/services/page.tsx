@@ -221,25 +221,6 @@ export default async function ServicesPage() {
 
       </div>
 
-      {/* Bottom Nav */}
-      <nav className="bottom-nav">
-        <Link href="/dashboard" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="1" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="1" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/><rect x="13" y="13" width="8" height="8" rx="2.5" fill="currentColor" opacity=".45"/></svg>
-          Inicio
-        </Link>
-        <Link href="/dashboard/agenda" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="3" width="20" height="17" rx="3" stroke="currentColor" strokeWidth="1.6"/><path d="M6 1v4M16 1v4M1 10h20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-          Agenda
-        </Link>
-        <Link href="/dashboard/appointments/new" className="nav-item">
-          <svg viewBox="0 0 22 22" fill="none"><path d="M2 5h18M2 11h12M2 17h8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
-          Turnos
-        </Link>
-        <Link href="/dashboard/profile" className="nav-item active">
-          <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="5" stroke="currentColor" strokeWidth="1.6"/><path d="M2 20c0-3.5 4-6 9-6s9 2.5 9 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-          Perfil
-        </Link>
-      </nav>
 
     </div>
   )

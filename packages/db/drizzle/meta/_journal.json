@@ -8,6 +8,34 @@
       "when": 1779748936131,
       "tag": "0000_glorious_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748613600000,
+      "tag": "0001_transfer_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780270257076,
+      "tag": "0002_sweet_black_panther",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780270800000,
+      "tag": "0003_rls_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780271000000,
+      "tag": "0004_subscriptions",
+      "breakpoints": true
     }
   ]
 }

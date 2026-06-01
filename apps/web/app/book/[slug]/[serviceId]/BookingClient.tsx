@@ -6,7 +6,14 @@ import { getAvailableSlots, bookAppointment } from "@/lib/actions/booking"
 import { BookziIcon } from "@/components/BookziLogo"
 
 type Service = { id: string; name: string; durationMinutes: number; price: string | null }
-type Business = { id: string; name: string; slug: string }
+type Business = {
+  id: string
+  name: string
+  slug: string
+  transferTitular: string | null
+  transferCbu: string | null
+  transferAlias: string | null
+}
 
 const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
 const DAYS_S = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"]
@@ -590,6 +597,52 @@ export default function BookingClient({ business, service }: { business: Busines
                   <span style={{ fontSize: 24, fontWeight: 900, color: "var(--accent)", letterSpacing: "-0.5px" }}>
                     ${Number(service.price).toLocaleString("es-AR")}
                   </span>
+                </div>
+              </div>
+            )}
+
+            {/* Datos bancarios del negocio */}
+            {(business.transferTitular || business.transferCbu || business.transferAlias) && (
+              <div style={{
+                background: "rgba(2,132,199,0.04)",
+                borderRadius: 16,
+                border: "1.5px solid rgba(2,132,199,0.15)",
+                padding: "16px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0284C7" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 6h18M3 14h12M3 18h8"/>
+                    <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round"/>
+                  </svg>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    Datos para la transferencia
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {business.transferTitular && (
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                      <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500 }}>Titular</span>
+                      <span style={{ fontSize: 13, color: "var(--text-dark)", fontWeight: 700, textAlign: "right" }}>
+                        {business.transferTitular}
+                      </span>
+                    </div>
+                  )}
+                  {business.transferCbu && (
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                      <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500 }}>CBU</span>
+                      <span style={{ fontSize: 13, color: "var(--text-dark)", fontWeight: 700, textAlign: "right", fontVariantNumeric: "tabular-nums", letterSpacing: "0.02em" }}>
+                        {business.transferCbu}
+                      </span>
+                    </div>
+                  )}
+                  {business.transferAlias && (
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                      <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500 }}>Alias</span>
+                      <span style={{ fontSize: 13, color: "var(--text-dark)", fontWeight: 700, textAlign: "right" }}>
+                        {business.transferAlias}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

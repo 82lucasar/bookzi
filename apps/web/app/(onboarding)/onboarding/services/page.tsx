@@ -63,14 +63,14 @@ export default function ServicesPage() {
               <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </Link>
-          <span className="step-label">Paso 2 de 3</span>
+          <span className="step-label">Paso 2 de 4</span>
         </div>
         <Link href="/dashboard" className="logo-home-btn">B</Link>
       </div>
 
       <div className="progress-wrap">
         <div className="progress-bar">
-          <div className="progress-fill" style={{ width: "66%" }}></div>
+          <div className="progress-fill" style={{ width: "50%" }}></div>
         </div>
       </div>
 

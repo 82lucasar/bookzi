@@ -1,10 +1,52 @@
 "use server"
 
+import { z } from "zod"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { db } from "@bookzi/db"
 import { businesses, staff } from "@bookzi/db/schema"
 import { eq } from "drizzle-orm"
+
+const CreateBusinessSchema = z.object({
+  name: z.string().min(1, "El nombre del negocio es obligatorio").max(255),
+  category: z.string().max(100).optional(),
+  phone: z.string().max(30).optional(),
+})
+
+const TransferDataSchema = z.object({
+  titular: z.string().max(255),
+  cbu: z.string().max(22).regex(/^\d*$/, "El CBU solo puede contener números").refine(v => !v || v.length === 22, "El CBU debe tener exactamente 22 dígitos"),
+  alias: z.string().max(100),
+})
+
+export async function saveTransferData(data: {
+  titular: string
+  cbu: string
+  alias: string
+}) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/login")
+
+  const business = await getMyBusiness()
+  if (!business) redirect("/dashboard/setup")
+
+  const parsed = TransferDataSchema.parse({
+    titular: data.titular.trim(),
+    cbu: data.cbu.trim(),
+    alias: data.alias.trim(),
+  })
+
+  await db
+    .update(businesses)
+    .set({
+      transferTitular: parsed.titular || null,
+      transferCbu: parsed.cbu || null,
+      transferAlias: parsed.alias || null,
+      updatedAt: new Date(),
+    })
+    .where(eq(businesses.id, business.id))
+}
 
 export async function getMyBusiness() {
   const supabase = await createClient()
@@ -25,9 +67,15 @@ export async function createBusiness(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
-  const name     = formData.get("name") as string
-  const category = formData.get("category") as string
-  const phone    = formData.get("phone") as string
+  const parsedBusiness = CreateBusinessSchema.parse({
+    name: formData.get("name"),
+    category: formData.get("category"),
+    phone: formData.get("phone"),
+  })
+
+  const name     = parsedBusiness.name
+  const category = parsedBusiness.category
+  const phone    = parsedBusiness.phone
 
   const defaultDuration = Number(formData.get("defaultDuration") ?? 30)
   const bufferTime      = Number(formData.get("bufferTime") ?? 0)
