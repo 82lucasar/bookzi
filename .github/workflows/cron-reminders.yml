@@ -1,0 +1,21 @@
+name: Cron — Recordatorios de turnos
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # cada hora en punto
+  workflow_dispatch:       # permite correrlo manualmente desde GitHub
+
+jobs:
+  reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar endpoint de recordatorios
+        run: |
+          STATUS=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            ${{ secrets.APP_URL }}/api/cron/reminders)
+          cat /tmp/response.json
+          if [ "$STATUS" != "200" ]; then
+            echo "Error: HTTP $STATUS"
+            exit 1
+          fi
