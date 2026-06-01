@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
 import { getAppointment } from "@/lib/actions/appointments"
+import Link from "next/link"
 import AppointmentActions from "./AppointmentActions"
 import PaymentProofSection from "./PaymentProofSection"
 
@@ -55,14 +56,15 @@ export default async function AppointmentDetailPage({
         position: "sticky", top: 0, zIndex: 40,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <a
+          <Link
             href="/dashboard/appointments"
             style={{ width: 36, height: 36, borderRadius: 10, border: "1.5px solid #E0F0F8", display: "flex", alignItems: "center", justifyContent: "center", color: "#0F172A", textDecoration: "none", flexShrink: 0 }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+
             </svg>
-          </a>
+          </Link>
           <span style={{ fontSize: 17, fontWeight: 700, color: "#0F172A" }}>Detalle del turno</span>
         </div>
         <a href="/dashboard" className="logo-home-btn">B</a>
