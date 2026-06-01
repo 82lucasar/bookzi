@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: "20"
       - uses: pnpm/action-setup@v4
-      - run: pnpm install
+      - run: pnpm install --ignore-scripts
       - run: pnpm turbo typecheck
 
   lint:
@@ -28,5 +28,5 @@ jobs:
         with:
           node-version: "20"
       - uses: pnpm/action-setup@v4
-      - run: pnpm install
+      - run: pnpm install --ignore-scripts
       - run: pnpm turbo lint
