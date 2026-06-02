@@ -3,6 +3,7 @@ import cors from "@fastify/cors"
 import helmet from "@fastify/helmet"
 import rateLimit from "@fastify/rate-limit"
 import sensible from "@fastify/sensible"
+import { ZodError } from "zod"
 import authPlugin from "./plugins/auth.js"
 import businessRoutes from "./routes/businesses.js"
 import serviceRoutes from "./routes/services.js"
@@ -44,6 +45,19 @@ export async function buildApp() {
   await app.register(appointmentRoutes)
   await app.register(publicRoutes)
   await app.register(webhookRoutes)
+
+  // Convierte ZodError en 400 antes de que llegue al handler de Fastify (que lo devolvería como 500)
+  app.setErrorHandler((error, _request, reply) => {
+    if (error instanceof ZodError) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: "Validation Error",
+        message: error.errors[0]?.message ?? "Datos inválidos",
+        details: error.errors.map(e => ({ path: e.path.join("."), message: e.message })),
+      })
+    }
+    reply.send(error)
+  })
 
   app.get("/health", async () => ({
     status: "ok",

@@ -82,15 +82,18 @@ export default async function publicRoutes(fastify: FastifyInstance) {
     return { slots }
   })
 
-  // Booking público (cliente reserva)
-  fastify.post("/api/v1/public/appointments", async (request, reply) => {
+  // Booking público (cliente reserva) — rate limit estricto para prevenir spam
+  fastify.post("/api/v1/public/appointments", {
+    config: { rateLimit: { max: 10, timeWindow: "5 minutes" } },
+  }, async (request, reply) => {
     const data = BookSchema.parse(request.body)
     const appt = await createAppointment(data.businessId, data, "pending")
     reply.status(201)
     return { appointmentId: appt?.id }
   })
 
-  // Detalle público de un turno (para la pantalla de confirmación)
+  // Detalle público de un turno (pantalla de confirmación)
+  // Solo expone datos no sensibles — no incluye email ni teléfono del cliente
   fastify.get("/api/v1/public/appointments/:id", async (request) => {
     const { id } = request.params as { id: string }
 
@@ -102,14 +105,14 @@ export default async function publicRoutes(fastify: FastifyInstance) {
         endAt:         appointments.endAt,
         priceSnapshot: appointments.priceSnapshot,
         serviceName:   services.name,
-        clientName:    clients.name,
+        clientName:    clients.name,  // solo nombre, no email/phone
         businessName:  businesses.name,
       })
       .from(appointments)
       .innerJoin(services,   eq(appointments.serviceId,  services.id))
       .innerJoin(clients,    eq(appointments.clientId,   clients.id))
       .innerJoin(businesses, eq(appointments.businessId, businesses.id))
-      .where(eq(appointments.id, id))
+      .where(and(eq(appointments.id, id), isNull(appointments.deletedAt)))
       .limit(1)
 
     if (!row) throw fastify.httpErrors.notFound("Turno no encontrado")

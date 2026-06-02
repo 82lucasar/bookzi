@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify"
 import { db, appointments, services, clients, staff, businesses } from "@bookzi/db"
-import { eq, and, gte, lte, isNull } from "drizzle-orm"
+import { eq, and, gte, lte, lt, ne, isNull } from "drizzle-orm"
 import { z } from "zod"
 import { getBusinessForUser } from "./businesses.js"
 import { enqueueNotification } from "../queues/notifications.js"
@@ -228,6 +228,21 @@ export async function createAppointment(
 
   const startAt = new Date(`${data.date}T${data.time}:00-03:00`)
   const endAt   = new Date(startAt.getTime() + svc.durationMinutes * 60000)
+
+  // Anti-double-booking: verifica solapamiento antes de insertar
+  const conflict = await db
+    .select({ id: appointments.id })
+    .from(appointments)
+    .where(and(
+      eq(appointments.staffId,    staffId),
+      ne(appointments.status, "cancelled"),
+      isNull(appointments.deletedAt),
+      lt(appointments.startAt, endAt),
+      gte(appointments.endAt,   startAt),
+    ))
+    .limit(1)
+
+  if (conflict.length > 0) throw new Error("El horario ya no está disponible. Por favor elegí otro.")
 
   let [client] = await db
     .select()
