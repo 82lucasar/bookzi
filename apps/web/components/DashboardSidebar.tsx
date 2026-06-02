@@ -50,6 +50,19 @@ const NAV = [
     ),
   },
   {
+    href: "/dashboard/clients",
+    label: "Clientes",
+    exact: false,
+    icon: () => (
+      <svg viewBox="0 0 18 18" fill="none">
+        <circle cx="6.5" cy="6" r="3" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M1 15c0-2.5 2.5-4.5 5.5-4.5S12 12.5 12 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="13.5" cy="6" r="2.5" stroke="currentColor" strokeWidth="1.5" opacity=".7"/>
+        <path d="M15 13.5c1 .4 2 1.2 2 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity=".7"/>
+      </svg>
+    ),
+  },
+  {
     href: "/dashboard/profile",
     label: "Perfil",
     exact: false,
