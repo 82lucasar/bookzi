@@ -21,6 +21,7 @@
     "@fastify/jwt": "^9.0.1",
     "@fastify/rate-limit": "^10.1.1",
     "@fastify/sensible": "^6.0.4",
+    "@sentry/node": "^10.55.0",
     "@supabase/supabase-js": "^2.106.1",
     "@upstash/redis": "^1.34.3",
     "bullmq": "^5.34.8",

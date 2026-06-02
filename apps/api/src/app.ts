@@ -4,6 +4,7 @@ import helmet from "@fastify/helmet"
 import rateLimit from "@fastify/rate-limit"
 import sensible from "@fastify/sensible"
 import { ZodError } from "zod"
+import sentryPlugin, { Sentry } from "./plugins/sentry.js"
 import authPlugin from "./plugins/auth.js"
 import businessRoutes from "./routes/businesses.js"
 import serviceRoutes from "./routes/services.js"
@@ -20,6 +21,7 @@ export async function buildApp() {
     },
   })
 
+  await app.register(sentryPlugin)
   await app.register(sensible)
   await app.register(helmet)
 
@@ -56,6 +58,8 @@ export async function buildApp() {
         details: error.errors.map(e => ({ path: e.path.join("."), message: e.message })),
       })
     }
+    const status = (error as { statusCode?: number }).statusCode ?? 500
+    if (status >= 500) Sentry.captureException(error)
     reply.send(error)
   })
 
