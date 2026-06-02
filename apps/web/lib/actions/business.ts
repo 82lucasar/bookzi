@@ -9,8 +9,8 @@ import { eq } from "drizzle-orm"
 
 const CreateBusinessSchema = z.object({
   name: z.string().min(1, "El nombre del negocio es obligatorio").max(255),
-  category: z.string().max(100).optional(),
-  phone: z.string().max(30).optional(),
+  category: z.string().max(100).optional().nullable(),
+  phone: z.string().max(30).optional().nullable(),
 })
 
 const TransferDataSchema = z.object({

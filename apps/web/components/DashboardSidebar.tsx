@@ -17,6 +17,18 @@ const NAV = [
     ),
   },
   {
+    href: "/dashboard/analytics",
+    label: "Métricas",
+    exact: false,
+    icon: () => (
+      <svg viewBox="0 0 18 18" fill="none">
+        <rect x="1" y="10" width="4" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+        <rect x="7" y="6" width="4" height="11" rx="1" fill="currentColor"/>
+        <rect x="13" y="2" width="4" height="15" rx="1" fill="currentColor" opacity="0.7"/>
+      </svg>
+    ),
+  },
+  {
     href: "/dashboard/agenda",
     label: "Agenda",
     exact: false,

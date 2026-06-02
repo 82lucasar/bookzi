@@ -18,7 +18,7 @@ const DAYS_ORDER = [
   "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
 ]
 
-export async function getAvailability(): Promise<DayConfig[]> {
+export async function getAvailability(staffId?: string): Promise<DayConfig[]> {
   const business = await getMyBusiness()
   if (!business) return getDefaultSchedule()
 
@@ -27,7 +27,7 @@ export async function getAvailability(): Promise<DayConfig[]> {
     .from(availability)
     .where(and(
       eq(availability.businessId, business.id),
-      isNull(availability.staffId),
+      staffId ? eq(availability.staffId, staffId) : isNull(availability.staffId),
     ))
 
   if (rows.length === 0) return getDefaultSchedule()
@@ -55,7 +55,7 @@ export async function getAvailability(): Promise<DayConfig[]> {
   })
 }
 
-export async function saveAvailability(days: DayConfig[]) {
+export async function saveAvailability(days: DayConfig[], staffId?: string) {
   const business = await getMyBusiness()
   if (!business) return
 
@@ -63,7 +63,7 @@ export async function saveAvailability(days: DayConfig[]) {
     .delete(availability)
     .where(and(
       eq(availability.businessId, business.id),
-      isNull(availability.staffId),
+      staffId ? eq(availability.staffId, staffId) : isNull(availability.staffId),
     ))
 
   const inserted = await db.insert(availability).values(
@@ -71,7 +71,7 @@ export async function saveAvailability(days: DayConfig[]) {
       const d = days.find(x => x.day === day)
       return {
         businessId: business.id,
-        staffId: null,
+        staffId: staffId ?? null,
         dayOfWeek: day as typeof availability.$inferInsert["dayOfWeek"],
         startTime: d?.startTime ?? "09:00",
         endTime: d?.endTime ?? "18:00",
@@ -94,6 +94,7 @@ export async function saveAvailability(days: DayConfig[]) {
   }
 
   revalidatePath("/dashboard/availability")
+  if (staffId) revalidatePath(`/dashboard/staff/${staffId}/availability`)
 }
 
 function getDefaultSchedule(): DayConfig[] {

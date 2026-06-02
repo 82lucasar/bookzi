@@ -11,7 +11,11 @@ type Appt = {
   status: string
   clientName: string
   serviceName: string
+  staffId: string
+  staffName: string
 }
+
+type StaffItem = { id: string; name: string }
 
 type ViewMode = "week" | "month"
 
@@ -125,26 +129,38 @@ function layoutAppts(appts: Appt[]): Map<string, { col: number; cols: number }> 
   return result
 }
 
-export default function AgendaCalendar({ appointments }: { appointments: Appt[] }) {
+export default function AgendaCalendar({
+  appointments,
+  staff = [],
+}: {
+  appointments: Appt[]
+  staff?: StaffItem[]
+}) {
   const router = useRouter()
   const today  = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d }, [])
 
-  const [view,        setView]        = useState<ViewMode>("week")
-  const [weekOffset,  setWeekOffset]  = useState(0)
-  const [monthOffset, setMonthOffset] = useState(0)
-  const [selDayIdx,   setSelDayIdx]   = useState<number>(() => {
-    // Arrancar en el día de hoy (0=lun … 6=dom)
+  const [view,           setView]           = useState<ViewMode>("week")
+  const [weekOffset,     setWeekOffset]     = useState(0)
+  const [monthOffset,    setMonthOffset]    = useState(0)
+  const [selectedStaff,  setSelectedStaff]  = useState<string>("all")
+  const [selDayIdx,      setSelDayIdx]      = useState<number>(() => {
     const dow = new Date().getDay()
     return dow === 0 ? 6 : dow - 1
   })
+
+  // Filtro de staff
+  const filteredAppts = useMemo(
+    () => selectedStaff === "all" ? appointments : appointments.filter(a => a.staffId === selectedStaff),
+    [appointments, selectedStaff]
+  )
 
   // ── Semana ──────────────────────────────────────────────────────────────
   const weekDays = useMemo(() => getWeekDays(weekOffset), [weekOffset])
   const selDay   = weekDays[selDayIdx] ?? weekDays[0]!
 
   const selDayAppts = useMemo(
-    () => appointments.filter(a => sameDay(new Date(a.startAt), selDay)),
-    [appointments, selDay]
+    () => filteredAppts.filter(a => sameDay(new Date(a.startAt), selDay)),
+    [filteredAppts, selDay]
   )
   const overlapMap = useMemo(() => layoutAppts(selDayAppts), [selDayAppts])
 
@@ -178,7 +194,7 @@ export default function AgendaCalendar({ appointments }: { appointments: Appt[] 
       cells.push({ n: prevLast - firstDow + 1 + i, type: "prev", isToday: false, appts: [] })
     for (let d = 1; d <= lastDate; d++) {
       const date     = new Date(y, m, d)
-      const dayAppts = appointments.filter(a => sameDay(new Date(a.startAt), date))
+      const dayAppts = filteredAppts.filter(a => sameDay(new Date(a.startAt), date))
       cells.push({ n: d, type: "cur", isToday: sameDay(date, today), appts: dayAppts })
     }
     for (let d = 1; d <= 42 - cells.length; d++)
@@ -234,6 +250,29 @@ export default function AgendaCalendar({ appointments }: { appointments: Appt[] 
         </div>
       </div>
 
+      {/* ── Filtro por espacio (solo si hay más de 1 staff activo) ── */}
+      {staff.length > 1 && (
+        <div style={{ background: "var(--bg-white)", borderBottom: "1px solid var(--border)", padding: "8px 16px", display: "flex", gap: 6, overflowX: "auto", scrollbarWidth: "none", position: "sticky", top: 112, zIndex: 39 }}>
+          {[{ id: "all", name: "Todos" }, ...staff].map(s => (
+            <button
+              key={s.id}
+              onClick={() => setSelectedStaff(s.id)}
+              style={{
+                flexShrink: 0, padding: "5px 12px", borderRadius: 100,
+                fontSize: 12, fontWeight: 700, border: "1.5px solid",
+                cursor: "pointer", fontFamily: "var(--font)",
+                transition: "all 150ms",
+                borderColor: selectedStaff === s.id ? "var(--primary)" : "var(--border)",
+                background:  selectedStaff === s.id ? "var(--primary)" : "white",
+                color:       selectedStaff === s.id ? "white" : "var(--text-muted)",
+              }}
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* ══ VISTA SEMANA ═══════════════════════════════════════════════════ */}
       {view === "week" && (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -243,7 +282,7 @@ export default function AgendaCalendar({ appointments }: { appointments: Appt[] 
             {weekDays.map((day, i) => {
               const isToday = sameDay(day, today)
               const isSel   = i === selDayIdx
-              const hasAppt = appointments.some(a => sameDay(new Date(a.startAt), day))
+              const hasAppt = filteredAppts.some(a => sameDay(new Date(a.startAt), day))
               return (
                 <button
                   key={i}

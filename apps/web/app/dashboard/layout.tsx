@@ -19,9 +19,11 @@ export default async function DashboardLayout({
 
   const business = await getMyBusiness()
 
-  const [sub] = await db.select().from(subscriptions)
-    .where(eq(subscriptions.businessId, business?.id ?? ""))
-    .limit(1)
+  const [sub] = business?.id
+    ? await db.select().from(subscriptions)
+        .where(eq(subscriptions.businessId, business.id))
+        .limit(1)
+    : [undefined]
 
   const daysLeft = sub?.trialEndsAt
     ? Math.ceil((new Date(sub.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))

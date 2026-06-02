@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
 import { getAppointmentsForCalendar } from "@/lib/actions/appointments"
+import { getStaff } from "@/lib/actions/staff"
 import AgendaCalendar from "./AgendaCalendar"
 
 export default async function AgendaPage() {
@@ -13,7 +14,10 @@ export default async function AgendaPage() {
   const business = await getMyBusiness()
   if (!business) redirect("/dashboard/setup")
 
-  const appts = await getAppointmentsForCalendar()
+  const [appts, staffList] = await Promise.all([
+    getAppointmentsForCalendar(),
+    getStaff(),
+  ])
 
   const serialized = appts.map(a => ({
     id: a.id,
@@ -22,7 +26,13 @@ export default async function AgendaPage() {
     status: a.status,
     clientName: a.clientName,
     serviceName: a.serviceName,
+    staffId: a.staffId,
+    staffName: a.staffName,
   }))
 
-  return <AgendaCalendar appointments={serialized} />
+  const activeStaff = staffList
+    .filter(s => s.isActive)
+    .map(s => ({ id: s.id, name: s.name }))
+
+  return <AgendaCalendar appointments={serialized} staff={activeStaff} />
 }

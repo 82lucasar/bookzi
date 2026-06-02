@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getMyBusiness } from "@/lib/actions/business"
+import { getStaff } from "@/lib/actions/staff"
 import Link from "next/link"
 import LogoutButton from "./LogoutButton"
 import BookingLinkBox from "./BookingLinkBox"
@@ -11,7 +12,10 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
-  const business = await getMyBusiness()
+  const [business, staffList] = await Promise.all([
+    getMyBusiness(),
+    getStaff(),
+  ])
   if (!business) redirect("/onboarding/welcome")
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://bookzi-three.vercel.app").replace(/\/$/, "")
@@ -72,6 +76,67 @@ export default async function ProfilePage() {
           <div style={{ padding: "14px 16px" }}>
             <BookingLinkBox bookingUrl={bookingUrl} />
           </div>
+        </div>
+
+        {/* Colaboradores */}
+        <div style={{ background: "var(--bg-white)", borderRadius: 16, border: "1px solid var(--border)", overflow: "hidden" }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(2,132,199,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <circle cx="7" cy="6" r="3.5" stroke="var(--primary)" strokeWidth="1.4"/>
+                  <path d="M1 16c0-3 2.7-5 6-5" stroke="var(--primary)" strokeWidth="1.4" strokeLinecap="round"/>
+                  <circle cx="13" cy="6" r="3" stroke="var(--primary)" strokeWidth="1.4"/>
+                  <path d="M11.5 11c2.2.3 4.1 2 4.5 5" stroke="var(--primary)" strokeWidth="1.4" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text-dark)" }}>
+                Colaboradores
+                {staffList.length > 0 && (
+                  <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 700, color: "var(--primary)", background: "rgba(2,132,199,0.10)", borderRadius: 100, padding: "2px 8px" }}>
+                    {staffList.length}
+                  </span>
+                )}
+              </span>
+            </div>
+            <Link href="/dashboard/staff/new" style={{ fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>
+              + Agregar
+            </Link>
+          </div>
+
+          {staffList.length === 0 ? (
+            <Link href="/dashboard/staff/new" style={{ textDecoration: "none" }}>
+              <div style={{ padding: "16px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--bg-muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round"/></svg>
+                </div>
+                <span style={{ fontSize: 14, color: "var(--text-muted)" }}>Agregar primer colaborador</span>
+              </div>
+            </Link>
+          ) : (
+            <>
+              {staffList.map((s, i) => (
+                <Link key={s.id} href={`/dashboard/staff/${s.id}`} style={{ textDecoration: "none" }}>
+                  <div style={{ padding: "12px 16px", borderBottom: i < staffList.length - 1 ? "1px solid var(--border)" : "none", display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: "50%", flexShrink: 0, background: s.isActive ? "linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)" : "var(--bg-muted)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: s.isActive ? "white" : "var(--text-muted)" }}>
+                      {s.name.split(" ").slice(0, 2).map(w => w[0]?.toUpperCase() ?? "").join("")}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-dark)" }}>{s.name}</div>
+                      <div style={{ fontSize: 12, color: s.isActive ? "var(--accent)" : "var(--text-muted)" }}>{s.isActive ? "Activo" : "Inactivo"}</div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="var(--text-muted)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                </Link>
+              ))}
+              <Link href="/dashboard/staff" style={{ textDecoration: "none" }}>
+                <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--primary)" }}>Ver todos los colaboradores</span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 3l3.5 3.5L4 9" stroke="var(--primary)" strokeWidth="1.6" strokeLinecap="round"/></svg>
+                </div>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Configuración */}

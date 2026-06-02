@@ -71,10 +71,13 @@ export async function getAppointmentsForCalendar() {
       status: appointments.status,
       clientName: clients.name,
       serviceName: services.name,
+      staffId: appointments.staffId,
+      staffName: staff.name,
     })
     .from(appointments)
     .innerJoin(services, eq(appointments.serviceId, services.id))
     .innerJoin(clients, eq(appointments.clientId, clients.id))
+    .innerJoin(staff, eq(appointments.staffId, staff.id))
     .where(and(
       eq(appointments.businessId, business.id),
       ne(appointments.status, "cancelled"),

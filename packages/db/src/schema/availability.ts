@@ -1,4 +1,4 @@
-import { pgTable, uuid, boolean, time, timestamp, primaryKey } from "drizzle-orm/pg-core"
+import { pgTable, uuid, boolean, time, timestamp, primaryKey, text } from "drizzle-orm/pg-core"
 import { dayOfWeekEnum } from "./enums"
 import { businesses } from "./businesses"
 import { staff } from "./staff"
@@ -31,6 +31,6 @@ export const availabilityBlocks = pgTable("availability_blocks", {
   staffId:    uuid("staff_id").references(() => staff.id),
   startsAt:   timestamp("starts_at", { withTimezone: true }).notNull(),
   endsAt:     timestamp("ends_at", { withTimezone: true }).notNull(),
-  reason:     uuid("reason"),
+  reason:     text("reason"),
   createdAt:  timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 })

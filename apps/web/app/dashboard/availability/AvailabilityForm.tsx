@@ -26,9 +26,11 @@ type ServiceItem = { id: string; name: string }
 export default function AvailabilityForm({
   initial,
   services,
+  staffId,
 }: {
   initial: DayConfig[]
   services: ServiceItem[]
+  staffId?: string
 }) {
   const router = useRouter()
   const [schedule, setSchedule] = useState<DayConfig[]>(initial)
@@ -55,8 +57,8 @@ export default function AvailabilityForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
-    await saveAvailability(schedule)
-    router.push("/dashboard")
+    await saveAvailability(schedule, staffId)
+    router.push(staffId ? `/dashboard/staff/${staffId}` : "/dashboard")
   }
 
   const selectStyle: React.CSSProperties = {

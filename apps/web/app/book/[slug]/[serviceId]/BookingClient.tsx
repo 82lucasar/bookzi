@@ -42,12 +42,16 @@ function formatDateNice(dateStr: string) {
   })
 }
 
-type Step = "fecha" | "datos" | "pago"
+type Step = "staff" | "fecha" | "datos" | "pago"
 
-// ── Progress bar (4 nodos) ────────────────────────────────────────────────────
-function ProgressBar({ step }: { step: Step }) {
-  const steps = ["SERVICIO", "FECHA", "TUS DATOS", "PAGO"]
-  const stepIdx = step === "fecha" ? 1 : step === "datos" ? 2 : 3
+// ── Progress bar ──────────────────────────────────────────────────────────────
+function ProgressBar({ step, showStaff }: { step: Step; showStaff: boolean }) {
+  const steps = showStaff
+    ? ["SERVICIO", "PROFES.", "FECHA", "DATOS", "PAGO"]
+    : ["SERVICIO", "FECHA", "DATOS", "PAGO"]
+  const stepIdx = showStaff
+    ? ({ staff: 1, fecha: 2, datos: 3, pago: 4 } as Record<Step, number>)[step]
+    : ({ fecha: 1, datos: 2, pago: 3 } as Record<Step, number>)[step] ?? 1
 
   return (
     <div style={{
@@ -110,11 +114,13 @@ function TurnoResumen({
   service,
   selectedDate,
   selectedSlot,
+  staffName,
   showPrice,
 }: {
   service: Service
   selectedDate: string
   selectedSlot: string
+  staffName?: string | null
   showPrice?: boolean
 }) {
   return (
@@ -144,6 +150,7 @@ function TurnoResumen({
           </p>
           <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "1px 0 0", fontWeight: 500 }}>
             {formatDuration(service.durationMinutes)}
+            {staffName ? ` · ${staffName}` : ""}
           </p>
         </div>
       </div>
@@ -156,8 +163,18 @@ function TurnoResumen({
   )
 }
 
+type StaffItem = { id: string; name: string }
+
 // ── Componente principal ──────────────────────────────────────────────────────
-export default function BookingClient({ business, service }: { business: Business; service: Service }) {
+export default function BookingClient({
+  business,
+  service,
+  staffList = [],
+}: {
+  business: Business
+  service: Service
+  staffList?: StaffItem[]
+}) {
   const today = new Date()
   const [year, setYear]   = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
@@ -165,7 +182,12 @@ export default function BookingClient({ business, service }: { business: Busines
   const [slots, setSlots] = useState<string[]>([])
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [loadingSlots, setLoadingSlots] = useState(false)
-  const [step, setStep] = useState<Step>("fecha")
+  const showStaffSelector = staffList.length > 1
+  const [step, setStep] = useState<Step>(showStaffSelector ? "staff" : "fecha")
+  // Con 1 elegible: pre-asignar su ID automáticamente
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(
+    staffList.length === 1 ? (staffList[0]?.id ?? null) : null,
+  )
 
   // Paso datos
   const [clientName, setClientName]   = useState("")
@@ -199,9 +221,16 @@ export default function BookingClient({ business, service }: { business: Busines
     setSelectedDate(dateStr)
     setSelectedSlot(null)
     setLoadingSlots(true)
-    const available = await getAvailableSlots(business.id, service.id, dateStr)
+    const available = await getAvailableSlots(business.id, service.id, dateStr, selectedStaffId)
     setSlots(available)
     setLoadingSlots(false)
+  }
+
+  function handleStaffChange(staffId: string | null) {
+    setSelectedStaffId(staffId)
+    setSelectedDate(null)
+    setSlots([])
+    setSelectedSlot(null)
   }
 
   const isPastDay = useCallback((day: number) => {
@@ -228,6 +257,7 @@ export default function BookingClient({ business, service }: { business: Busines
     const fd = new FormData()
     fd.append("businessId", business.id)
     fd.append("serviceId", service.id)
+    if (selectedStaffId) fd.append("staffId", selectedStaffId)
     fd.append("date", selectedDate!)
     fd.append("time", selectedSlot!)
     fd.append("clientName", clientName)
@@ -246,9 +276,92 @@ export default function BookingClient({ business, service }: { business: Busines
 
   return (
     <>
-      <ProgressBar step={step} />
+      <ProgressBar step={step} showStaff={showStaffSelector} />
 
       <div style={{ padding: "20px 0 120px", display: "flex", flexDirection: "column", gap: 16 }}>
+
+        {/* ═══════════════════════════════════════════════════
+            PASO 0: ELEGIR PROFESIONAL (solo si hay >1)
+        ═══════════════════════════════════════════════════ */}
+        {step === "staff" && (
+          <>
+            <div style={{ padding: "4px 16px 0" }}>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-dark)", letterSpacing: "-0.4px", margin: "0 0 6px" }}>
+                ¿Con quién querés atenderte?
+              </h2>
+              <p style={{ fontSize: 14, color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
+                Elegí tu profesional preferido o dejanos asignarte uno.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "0 16px" }}>
+
+              {/* Sin preferencia */}
+              <button
+                onClick={() => { setSelectedStaffId(null); setStep("fecha") }}
+                style={{
+                  width: "100%", display: "flex", alignItems: "center", gap: 14,
+                  background: "white", border: "1.5px solid var(--border)", borderRadius: 16,
+                  padding: "14px 16px", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
+                  transition: "border-color 150ms, box-shadow 150ms",
+                }}
+              >
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                  background: "var(--bg-muted)", border: "1.5px solid var(--border)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 18,
+                }}>
+                  🎲
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-dark)" }}>Sin preferencia</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
+                    Te asignamos el profesional disponible
+                  </div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M6 4l4 4-4 4" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              {/* Cada colaborador */}
+              {staffList.map(s => {
+                const initials = s.name.split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase() ?? "").join("")
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => { setSelectedStaffId(s.id); setStep("fecha") }}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", gap: 14,
+                      background: "white", border: "1.5px solid var(--border)", borderRadius: 16,
+                      padding: "14px 16px", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
+                      transition: "border-color 150ms, box-shadow 150ms",
+                    }}
+                  >
+                    <div style={{
+                      width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                      background: "linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 16, fontWeight: 800, color: "white",
+                    }}>
+                      {initials}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-dark)" }}>{s.name}</div>
+                      <div style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600, marginTop: 2 }}>
+                        Disponible
+                      </div>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                      <path d="M6 4l4 4-4 4" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                )
+              })}
+            </div>
+          </>
+        )}
 
         {/* ═══════════════════════════════════════════════════
             PASO 1: FECHA + SLOTS
@@ -461,6 +574,7 @@ export default function BookingClient({ business, service }: { business: Busines
               service={service}
               selectedDate={selectedDate}
               selectedSlot={selectedSlot}
+              staffName={staffList.find(s => s.id === selectedStaffId)?.name ?? null}
               showPrice={false}
             />
 
@@ -549,6 +663,7 @@ export default function BookingClient({ business, service }: { business: Busines
               service={service}
               selectedDate={selectedDate}
               selectedSlot={selectedSlot}
+              staffName={staffList.find(s => s.id === selectedStaffId)?.name ?? null}
               showPrice={true}
             />
 
@@ -757,30 +872,54 @@ export default function BookingClient({ business, service }: { business: Busines
         padding: "12px 16px",
         paddingBottom: "max(12px, env(safe-area-inset-bottom))",
       }}>
+        {step === "staff" && (
+          <p style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", margin: 0, fontWeight: 500 }}>
+            Tocá un profesional para continuar
+          </p>
+        )}
+
         {step === "fecha" && (
-          <>
-            <button
-              disabled={!canGoToDatos}
-              onClick={() => setStep("datos")}
-              style={{
-                width: "100%", height: 52, borderRadius: 14,
-                fontSize: 15, fontWeight: 800, color: "white",
-                background: canGoToDatos
-                  ? "linear-gradient(135deg, #0284C7, #0369A1)"
-                  : "var(--border)",
-                boxShadow: canGoToDatos ? "0 5px 18px rgba(2,132,199,0.40)" : "none",
-                cursor: canGoToDatos ? "pointer" : "not-allowed",
-                border: "none", transition: "all 200ms",
-              }}
-            >
-              {canGoToDatos ? "Siguiente — Mis datos →" : "Seleccioná una fecha y horario"}
-            </button>
-            {canGoToDatos && (
-              <p style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center", margin: "8px 0 0", fontWeight: 500 }}>
-                {formatDateNice(selectedDate!)} · {selectedSlot} hs
-              </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            {showStaffSelector && (
+              <button
+                onClick={() => setStep("staff")}
+                style={{
+                  width: 52, height: 52, borderRadius: 14, flexShrink: 0,
+                  border: "1.5px solid var(--border)", background: "var(--bg)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: "pointer", color: "var(--text-mid)",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
             )}
-          </>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+              <button
+                disabled={!canGoToDatos}
+                onClick={() => setStep("datos")}
+                style={{
+                  width: "100%", height: 52, borderRadius: 14,
+                  fontSize: 15, fontWeight: 800, color: "white",
+                  background: canGoToDatos ? "linear-gradient(135deg, #0284C7, #0369A1)" : "var(--border)",
+                  boxShadow: canGoToDatos ? "0 5px 18px rgba(2,132,199,0.40)" : "none",
+                  cursor: canGoToDatos ? "pointer" : "not-allowed",
+                  border: "none", transition: "all 200ms",
+                }}
+              >
+                {canGoToDatos ? "Siguiente — Mis datos →" : "Seleccioná una fecha y horario"}
+              </button>
+              {canGoToDatos && (
+                <p style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center", margin: 0, fontWeight: 500 }}>
+                  {formatDateNice(selectedDate!)} · {selectedSlot} hs
+                  {selectedStaffId && staffList.find(s => s.id === selectedStaffId) && (
+                    <> · {staffList.find(s => s.id === selectedStaffId)!.name}</>
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
         )}
 
         {step === "datos" && (

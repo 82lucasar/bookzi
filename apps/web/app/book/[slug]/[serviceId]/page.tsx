@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { getBookingBusiness } from "@/lib/actions/booking"
+import { getBookingBusiness, getStaffWithService } from "@/lib/actions/booking"
 import BookingClient from "./BookingClient"
 
 export const dynamic = "force-dynamic"
@@ -21,6 +21,9 @@ export default async function BookServicePage({
   if (!service) notFound()
 
   const { business } = data
+
+  // Solo los profesionales que tienen este servicio habilitado en al menos un día
+  const eligibleStaff = await getStaffWithService(business.id, serviceId)
 
   return (
     <div style={{ background: "var(--bg)", minHeight: "100dvh" }}>
@@ -77,6 +80,7 @@ export default async function BookServicePage({
             durationMinutes: service.durationMinutes,
             price: service.price,
           }}
+          staffList={eligibleStaff}
         />
       </div>
     </div>
