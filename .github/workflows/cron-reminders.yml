@@ -9,13 +9,26 @@ jobs:
   reminders:
     runs-on: ubuntu-latest
     steps:
-      - name: Llamar endpoint de recordatorios
+      - name: Recordatorios email (Next.js)
         run: |
-          STATUS=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+          STATUS=$(curl -s -o /tmp/res-email.json -w "%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             ${{ secrets.APP_URL }}/api/cron/reminders)
-          cat /tmp/response.json
+          cat /tmp/res-email.json
           if [ "$STATUS" != "200" ]; then
-            echo "Error: HTTP $STATUS"
+            echo "Error email reminders: HTTP $STATUS"
+            exit 1
+          fi
+
+      - name: Recordatorios WhatsApp (Fastify API)
+        run: |
+          STATUS=$(curl -s -o /tmp/res-wa.json -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            ${{ secrets.API_URL }}/api/v1/cron/reminders)
+          cat /tmp/res-wa.json
+          if [ "$STATUS" != "200" ]; then
+            echo "Error WhatsApp reminders: HTTP $STATUS"
             exit 1
           fi

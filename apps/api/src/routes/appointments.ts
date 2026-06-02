@@ -3,6 +3,7 @@ import { db, appointments, services, clients, staff, businesses } from "@bookzi/
 import { eq, and, gte, lte, isNull } from "drizzle-orm"
 import { z } from "zod"
 import { getBusinessForUser } from "./businesses.js"
+import { enqueueNotification } from "../queues/notifications.js"
 
 const VALID_STATUSES = ["pending", "confirmed", "completed", "cancelled", "rescheduled"] as const
 
@@ -140,8 +141,21 @@ export default async function appointmentRoutes(fastify: FastifyInstance) {
     if (!biz) throw fastify.httpErrors.notFound("Negocio no encontrado")
 
     const [existing] = await db
-      .select({ id: appointments.id })
+      .select({
+        id:          appointments.id,
+        startAt:     appointments.startAt,
+        endAt:       appointments.endAt,
+        clientId:    appointments.clientId,
+        clientName:  clients.name,
+        clientPhone: clients.phone,
+        clientEmail: clients.email,
+        serviceName: services.name,
+        priceSnapshot:    appointments.priceSnapshot,
+        currencySnapshot: appointments.currencySnapshot,
+      })
       .from(appointments)
+      .innerJoin(clients,  eq(appointments.clientId,  clients.id))
+      .innerJoin(services, eq(appointments.serviceId, services.id))
       .where(and(eq(appointments.id, id), eq(appointments.businessId, biz.id), isNull(appointments.deletedAt)))
       .limit(1)
     if (!existing) throw fastify.httpErrors.notFound("Turno no encontrado")
@@ -159,6 +173,26 @@ export default async function appointmentRoutes(fastify: FastifyInstance) {
       .set(extra)
       .where(eq(appointments.id, id))
       .returning()
+
+    const notifEvent = status === "confirmed" ? "appointment_confirmed" : "appointment_cancelled"
+    if (status === "confirmed" || status === "cancelled") {
+      await enqueueNotification({
+        appointmentId:  id,
+        event:          notifEvent,
+        recipientType:  "client",
+        recipientId:    existing.clientId,
+        recipientPhone: existing.clientPhone,
+        recipientEmail: existing.clientEmail,
+        recipientName:  existing.clientName,
+        businessName:   biz.name,
+        businessEmail:  biz.email,
+        serviceName:    existing.serviceName,
+        startAt:        existing.startAt.toISOString(),
+        endAt:          existing.endAt.toISOString(),
+        price:          existing.priceSnapshot,
+        currency:       existing.currencySnapshot,
+      })
+    }
 
     return updated
   })
@@ -211,6 +245,9 @@ export async function createAppointment(
     client = created!
   }
 
+  const [biz] = await db.select({ name: businesses.name, email: businesses.email })
+    .from(businesses).where(eq(businesses.id, businessId)).limit(1)
+
   const [inserted] = await db.insert(appointments).values({
     businessId,
     serviceId:        svc.id,
@@ -223,6 +260,25 @@ export async function createAppointment(
     priceSnapshot:    svc.price,
     currencySnapshot: svc.currency,
   }).returning()
+
+  if (inserted) {
+    await enqueueNotification({
+      appointmentId:  inserted.id,
+      event:          initialStatus === "confirmed" ? "appointment_confirmed" : "appointment_created",
+      recipientType:  "client",
+      recipientId:    client.id,
+      recipientPhone: client.phone,
+      recipientEmail: client.email,
+      recipientName:  client.name,
+      businessName:   biz?.name ?? "",
+      businessEmail:  biz?.email ?? null,
+      serviceName:    svc.name,
+      startAt:        startAt.toISOString(),
+      endAt:          endAt.toISOString(),
+      price:          svc.price,
+      currency:       svc.currency,
+    })
+  }
 
   return inserted
 }

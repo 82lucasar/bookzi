@@ -10,6 +10,7 @@ import staffRoutes from "./routes/staff.js"
 import availabilityRoutes from "./routes/availability.js"
 import appointmentRoutes from "./routes/appointments.js"
 import publicRoutes from "./routes/public.js"
+import webhookRoutes from "./routes/webhooks.js"
 
 export async function buildApp() {
   const app = Fastify({
@@ -42,6 +43,7 @@ export async function buildApp() {
   await app.register(availabilityRoutes)
   await app.register(appointmentRoutes)
   await app.register(publicRoutes)
+  await app.register(webhookRoutes)
 
   app.get("/health", async () => ({
     status: "ok",
