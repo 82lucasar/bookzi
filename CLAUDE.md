@@ -15,12 +15,12 @@ App de turnos online para profesionales y negocios que quieren optimizar su agen
 | Investigación de nombre | ✅ Completada |
 | Manual de marca (v1.0) | ✅ Completado |
 | Estructura de carpetas | ✅ Creada |
-| Definición de agentes IA | 🔲 Pendiente |
-| Diseño de mockups / wireframes | 🔲 Pendiente |
-| Arquitectura técnica | 🔲 Pendiente |
-| Desarrollo frontend | 🔲 Pendiente |
-| Desarrollo backend | 🔲 Pendiente |
-| App móvil | 🔲 Pendiente |
+| Definición de agentes IA | ✅ Completada (4 agentes de producto + 9 de desarrollo) |
+| Arquitectura técnica | ✅ Completada (plan-maestro.md) |
+| Desarrollo frontend web | ✅ En curso — dashboard, booking flow, auth, onboarding |
+| Desarrollo backend API | ✅ En curso — Fastify + rutas REST completas implementadas |
+| Notificaciones WhatsApp | 🔲 Pendiente (worker BullMQ + Meta Cloud API) |
+| App móvil | 🔲 Pendiente (React Native — Fase 3) |
 
 ---
 

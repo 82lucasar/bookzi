@@ -4,6 +4,12 @@ import helmet from "@fastify/helmet"
 import rateLimit from "@fastify/rate-limit"
 import sensible from "@fastify/sensible"
 import authPlugin from "./plugins/auth.js"
+import businessRoutes from "./routes/businesses.js"
+import serviceRoutes from "./routes/services.js"
+import staffRoutes from "./routes/staff.js"
+import availabilityRoutes from "./routes/availability.js"
+import appointmentRoutes from "./routes/appointments.js"
+import publicRoutes from "./routes/public.js"
 
 export async function buildApp() {
   const app = Fastify({
@@ -29,6 +35,13 @@ export async function buildApp() {
   })
 
   await app.register(authPlugin)
+
+  await app.register(businessRoutes)
+  await app.register(serviceRoutes)
+  await app.register(staffRoutes)
+  await app.register(availabilityRoutes)
+  await app.register(appointmentRoutes)
+  await app.register(publicRoutes)
 
   app.get("/health", async () => ({
     status: "ok",

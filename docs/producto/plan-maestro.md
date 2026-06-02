@@ -156,7 +156,7 @@ Business ──┬── Service ──── staff_services ──┐
 | Fase | Nombre | Duración estimada | Estado |
 |---|---|---|---|
 | 0 | Fundamentos | 3 semanas | ✅ Completada |
-| 1 | MVP | 10–12 semanas | 🔲 Próxima |
+| 1 | MVP | 10–12 semanas | 🔄 En progreso |
 | 2 | Producto completo | 8–10 semanas | 🔲 Pendiente |
 | 3 | Mobile & escala | 8–10 semanas | 🔲 Pendiente |
 | 4 | Crecimiento SaaS | Ongoing | 🔲 Pendiente |

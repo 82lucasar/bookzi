@@ -6,6 +6,9 @@ declare module "fastify" {
   interface FastifyRequest {
     userId: string
   }
+  interface FastifyInstance {
+    verifyToken: (request: FastifyRequest) => Promise<void>
+  }
 }
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {

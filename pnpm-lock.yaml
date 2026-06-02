@@ -56,6 +56,9 @@ importers:
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
+      drizzle-orm:
+        specifier: ^0.38.4
+        version: 0.38.4(@neondatabase/serverless@0.10.4)(@types/pg@8.11.6)(@types/react@19.2.15)(react@19.2.6)
       fastify:
         specifier: ^5.2.1
         version: 5.8.5
