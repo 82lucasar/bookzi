@@ -3,6 +3,7 @@ import { db } from "@bookzi/db"
 import { appointments, services, clients, businesses, notifications } from "@bookzi/db/schema"
 import { eq, and, gte, lt, isNull, ne } from "drizzle-orm"
 import { sendReminder24h, sendReminder2h } from "@/lib/email"
+import { requestReviewForAppointment } from "@/lib/actions/reviews"
 
 // Verifica que la llamada viene de Vercel Cron (o es un test manual)
 function isAuthorized(req: NextRequest): boolean {
@@ -137,10 +138,33 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // ── Solicitudes de reseña: turnos completados hace 1-2h ──────────────────
+  let sentReviews = 0
+  const reviewWindowStart = new Date(now.getTime() - 2 * 3600000)
+  const reviewWindowEnd   = new Date(now.getTime() - 1 * 3600000)
+
+  const completedAppts = await db
+    .select({ id: appointments.id, businessId: appointments.businessId })
+    .from(appointments)
+    .where(and(
+      eq(appointments.status, "completed"),
+      gte(appointments.endAt, reviewWindowStart),
+      lt(appointments.endAt,  reviewWindowEnd),
+      isNull(appointments.deletedAt),
+    ))
+
+  for (const appt of completedAppts) {
+    try {
+      await requestReviewForAppointment(appt.id, appt.businessId)
+      sentReviews++
+    } catch { /* continuar */ }
+  }
+
   return NextResponse.json({
     ok: true,
     sent24h,
     sent2h,
+    sentReviews,
     errors,
     processedAt: now.toISOString(),
   })

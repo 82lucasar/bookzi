@@ -43,6 +43,13 @@
       "when": 1748822400000,
       "tag": "0005_blocks_reason_text",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1749081600000,
+      "tag": "0006_reviews",
+      "breakpoints": true
     }
   ]
 }
