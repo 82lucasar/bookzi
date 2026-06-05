@@ -3,6 +3,7 @@
 import { useState, useTransition, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { getAvailableSlots, bookAppointment } from "@/lib/actions/booking"
+import WaitlistForm from "./WaitlistForm"
 import { BookziIcon } from "@/components/BookziLogo"
 
 type Service = { id: string; name: string; durationMinutes: number; price: string | null }
@@ -521,15 +522,12 @@ export default function BookingClient({
                     </p>
                   </div>
                 ) : slots.length === 0 ? (
-                  <div style={{ padding: "24px 0", textAlign: "center" }}>
-                    <p style={{ fontSize: 28, margin: "0 0 8px" }}>😕</p>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-dark)", margin: "0 0 4px" }}>
-                      Sin horarios disponibles
-                    </p>
-                    <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0 }}>
-                      Intentá con otro día.
-                    </p>
-                  </div>
+                  <WaitlistForm
+                    businessId={business.id}
+                    serviceId={service.id}
+                    selectedDate={selectedDate}
+                    serviceName={service.name}
+                  />
                 ) : (
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
                     {slots.map(slot => {

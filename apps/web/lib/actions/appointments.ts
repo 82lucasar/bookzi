@@ -6,6 +6,7 @@ import { db } from "@bookzi/db"
 import { appointments, services, clients, staff } from "@bookzi/db/schema"
 import { eq, and, gte, lt, desc, ne, isNull } from "drizzle-orm"
 import { getMyBusiness } from "./business"
+import { triggerWaitlistOnCancellation } from "./waitlist"
 import {
   sendAppointmentConfirmedToClient,
   sendAppointmentCancelledToClient,
@@ -229,6 +230,13 @@ export async function cancelAppointment(appointmentId: string) {
 
   const apptData = await getApptEmailData(appointmentId, business.id)
 
+  // Capturar serviceId y fecha ANTES de cancelar (para trigger de waitlist)
+  const [apptInfo] = await db
+    .select({ serviceId: appointments.serviceId, startAt: appointments.startAt })
+    .from(appointments)
+    .where(and(eq(appointments.id, appointmentId), eq(appointments.businessId, business.id)))
+    .limit(1)
+
   await db
     .update(appointments)
     .set({
@@ -246,17 +254,28 @@ export async function cancelAppointment(appointmentId: string) {
   revalidatePath("/dashboard/agenda")
   revalidatePath("/dashboard")
 
+  const tasks: Promise<unknown>[] = []
+
   if (apptData) {
     const emailBase = {
       ...apptData,
       businessName: business.name,
       businessEmail: business.email ?? null,
     }
-    await Promise.allSettled([
+    tasks.push(
       sendAppointmentCancelledToClient(emailBase),
       sendAppointmentCancelledToProfessional(emailBase),
-    ])
+    )
   }
+
+  // Notificar al primer cliente en lista de espera para este servicio+fecha
+  if (apptInfo) {
+    const dateStr = new Date(apptInfo.startAt)
+      .toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" })
+    tasks.push(triggerWaitlistOnCancellation(business.id, apptInfo.serviceId, dateStr))
+  }
+
+  await Promise.allSettled(tasks)
 }
 
 export async function createDashboardAppointment(data: {
