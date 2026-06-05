@@ -132,7 +132,7 @@ export default async function ReviewsPage() {
                           fontStyle: "italic", lineHeight: 1.5,
                           padding: "10px 12px", background: "#FAFAFA", borderRadius: 8,
                         }}>
-                          "{r.comment}"
+                          &ldquo;{r.comment}&rdquo;
                         </p>
                       )}
                     </div>

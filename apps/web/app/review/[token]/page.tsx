@@ -67,7 +67,7 @@ export default async function ReviewPage({
             </div>
             {review.comment && (
               <p style={{ fontSize: 14, color: "var(--text-muted)", fontStyle: "italic", margin: 0 }}>
-                "{review.comment}"
+                &ldquo;{review.comment}&rdquo;
               </p>
             )}
           </div>
