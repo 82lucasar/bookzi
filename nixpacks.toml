@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
+[phases.install]
+cmds = [
+  "npm install -g pnpm@11.2.2",
+  "pnpm install --frozen-lockfile"
+]
+
+[phases.build]
+cmds = ["pnpm turbo build --filter=@bookzi/api"]
+
+[start]
+cmd = "node apps/api/dist/server.js"
