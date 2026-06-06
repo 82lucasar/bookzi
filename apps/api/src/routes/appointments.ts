@@ -23,6 +23,7 @@ const CreateSchema = z.object({
   date:        z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   time:        z.string().regex(/^\d{2}:\d{2}$/),
   notes:       z.string().max(1000).optional().nullable(),
+  sendNotification: z.boolean().optional().default(false),
 })
 
 const StatusSchema = z.object({
@@ -128,6 +129,45 @@ export default async function appointmentRoutes(fastify: FastifyInstance) {
 
     const data = CreateSchema.parse(request.body)
     const appt = await createAppointment(biz.id, data, "confirmed")
+
+    if (data.sendNotification && appt) {
+      const [detail] = await db
+        .select({
+          clientId:    clients.id,
+          clientName:  clients.name,
+          clientPhone: clients.phone,
+          clientEmail: clients.email,
+          serviceName: services.name,
+          priceSnapshot:    appointments.priceSnapshot,
+          currencySnapshot: appointments.currencySnapshot,
+          startAt:     appointments.startAt,
+          endAt:       appointments.endAt,
+        })
+        .from(appointments)
+        .innerJoin(clients,  eq(appointments.clientId,  clients.id))
+        .innerJoin(services, eq(appointments.serviceId, services.id))
+        .where(eq(appointments.id, appt.id))
+        .limit(1)
+
+      if (detail) {
+        await enqueueNotification({
+          appointmentId:  appt.id,
+          event:          "appointment_confirmed",
+          recipientType:  "client",
+          recipientId:    detail.clientId,
+          recipientPhone: detail.clientPhone,
+          recipientEmail: detail.clientEmail,
+          recipientName:  detail.clientName,
+          businessName:   biz.name,
+          businessEmail:  biz.email,
+          serviceName:    detail.serviceName,
+          startAt:        detail.startAt.toISOString(),
+          endAt:          detail.endAt.toISOString(),
+          price:          detail.priceSnapshot,
+          currency:       detail.currencySnapshot,
+        })
+      }
+    }
 
     reply.status(201)
     return appt
