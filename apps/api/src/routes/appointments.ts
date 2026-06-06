@@ -23,7 +23,7 @@ const CreateSchema = z.object({
   date:        z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   time:        z.string().regex(/^\d{2}:\d{2}$/),
   notes:       z.string().max(1000).optional().nullable(),
-  sendNotification: z.boolean().optional().default(false),
+  sendNotification: z.boolean().optional(),
 })
 
 const StatusSchema = z.object({
@@ -130,7 +130,7 @@ export default async function appointmentRoutes(fastify: FastifyInstance) {
     const data = CreateSchema.parse(request.body)
     const appt = await createAppointment(biz.id, data, "confirmed")
 
-    if (data.sendNotification && appt) {
+    if (data.sendNotification === true && appt) {
       const [detail] = await db
         .select({
           clientId:    clients.id,
