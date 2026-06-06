@@ -266,7 +266,7 @@ async function computeSlotsForStaff(
   const slots: string[] = []
   for (let t = startMins; t + svc.durationMinutes <= endMins; t += slotMin) {
     if (isToday && t <= nowMins) continue
-    const slotStart = new Date(`${dateStr}T${pad(Math.floor(t / 60))}:${pad(t % 60)}:00`)
+    const slotStart = new Date(`${dateStr}T${pad(Math.floor(t / 60))}:${pad(t % 60)}:00-03:00`)
     const slotEnd   = new Date(slotStart.getTime() + svc.durationMinutes * 60000)
     const blocked   = booked.some(b => slotStart < new Date(b.endAt)    && slotEnd > new Date(b.startAt))
     const blocked2  = blocks.some(b => slotStart < new Date(b.endsAt)   && slotEnd > new Date(b.startsAt))
