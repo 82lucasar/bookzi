@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify"
 import { db, appointments, services, clients, staff, businesses } from "@bookzi/db"
-import { eq, and, gte, lte, lt, ne, isNull } from "drizzle-orm"
+import { eq, and, gte, lte, lt, gt, ne, isNull } from "drizzle-orm"
 import { z } from "zod"
 import { getBusinessForUser } from "./businesses.js"
 import { enqueueNotification } from "../queues/notifications.js"
@@ -278,7 +278,7 @@ export async function createAppointment(
       ne(appointments.status, "cancelled"),
       isNull(appointments.deletedAt),
       lt(appointments.startAt, endAt),
-      gte(appointments.endAt,   startAt),
+      gt(appointments.endAt,   startAt),
     ))
     .limit(1)
 
