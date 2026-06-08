@@ -1,31 +1,26 @@
-import { StyleSheet, Text, View } from "react-native"
+import { useEffect, useState } from "react"
+import { ActivityIndicator, View } from "react-native"
+import { Redirect } from "expo-router"
+import { supabase } from "../lib/supabase"
 
 export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Bookzi</Text>
-      <Text style={styles.subtitle}>Tu agenda inteligente</Text>
-    </View>
-  )
-}
+  const [loading, setLoading] = useState(true)
+  const [hasSession, setHasSession] = useState(false)
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F0F9FF",
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: "800",
-    color: "#0284C7",
-    letterSpacing: -1.5,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#334155",
-    marginTop: 8,
-  },
-})
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setHasSession(!!session)
+      setLoading(false)
+    })
+  }, [])
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F0F9FF" }}>
+        <ActivityIndicator size="large" color="#0284C7" />
+      </View>
+    )
+  }
+
+  return <Redirect href={hasSession ? "/(tabs)" : "/login"} />
+}

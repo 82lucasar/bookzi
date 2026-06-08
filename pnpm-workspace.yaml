@@ -1,6 +1,8 @@
 packages:
   - "apps/*"
   - "packages/*"
+overrides:
+  "@expo/metro-runtime": "~4.0.1"
 allowBuilds:
   '@sentry/cli': true
   esbuild: true
